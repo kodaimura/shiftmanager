@@ -1,0 +1,29 @@
+{{template "header" .}}
+<script src="https://cdn.rawgit.com/osamutake/japanese-holidays-js/v1.0.10/lib/japanese-holidays.min.js"></script>
+<input type="hidden" id='year' name='year' value="{{.year}}">
+<input type="hidden" id='month' name='month' value="{{.month}}">
+<input type="hidden" id="candidate" value="{{ .candidate }}">
+<input type="hidden" id="shift" name="shift" value="{{ .shift }}">
+<input type="hidden" id="storeholiday" name="storeholiday" value="{{ .storeholiday }}">
+<div class="mb-1">
+	<div class="d-flex justify-content-between calsize">
+	<h4>{{.year}}年{{.month}}月</h4>
+	<span id="error" class="text-danger"></span>
+	<input type="button" id="submit" class="btn btn-primary" value="保存">
+	</div>
+</div>
+<div id="calendar"></div>
+<div class="row">
+	<span id="count"></span>
+</div>
+<div class="row text-primary">
+	<span id="message"></span>
+</div>
+
+<div class="my-3">
+<a href="/shift/{{.year}}/{{.month}}/storeholiday" class="btn btn-outline-dark" role="button">シフト再作成</a>
+<a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
+</div>
+<link rel="stylesheet" href="/css/shift.css">
+<script type="text/javascript" src="/js/shift.js"></script>
+{{template "footer"}}

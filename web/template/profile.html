@@ -1,0 +1,44 @@
+{{template "header" .}}
+<h3>プロフィール設定</h3>
+<form method="POST" onsubmit="trim()">
+	<div class="row">
+    <div class="mb-3">
+    	<label for="groupname" class="form-label">所属グループ名</label>
+    	<input type="text" class="form-control form-control" name="groupname" required="required" id="groupname" value={{.profile.GroupName}}>
+    	<div class="form-text">英数字3文字以上推奨。グループメンバー全員で同じものを入力して下さい。(新人さんは先輩に確認して下さい。)</div>
+    </div>
+	</div>
+	<div class="row">
+		<div class="col-sm">
+    	<div class="mb-3">
+    		<label for="abbname" class="form-label">略名 (カレンダー表示用)</label>
+    		<input type="text" class="form-control form-control" name="abbname" required="required" value={{.profile.AbbName}}>
+    		<div class="form-text">イニシャル等。1~2文字推奨。グループ内で被らないように。</div>
+    	</div>
+   		</div>
+    	<div class="col-sm">
+    	<div class="mb-3">
+    	<label for="role" class="form-label">役割</label>
+    	<select class="form-select form-select" aria-label="role" name="role">
+    		{{range .roles}}
+    		{{ if eq $.profile.Role .Key1}}
+    		<option value={{.Key1}} selected>{{.Value1}}</option>
+    		{{ else }}
+    		<option value={{.Key1}}>{{.Value1}}</option>
+    		{{end}}
+    		{{end}}
+		</select>
+		<div class="form-text">新人さんは教わった方を選択して下さい。</div>
+		</div>
+		</div>
+	</div>
+    <button type="submit" class="btn btn-primary btn-md">登録</button>
+</form>
+<a href="/" class="my-3 btn btn-outline-secondary" role="button">ホームに戻る</a>
+<script>
+const trim = () => {
+	document.getElementById("groupname").value 
+	= document.getElementById("groupname").value.trim()
+}
+</script>
+{{template "footer"}}

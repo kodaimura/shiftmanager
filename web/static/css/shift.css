@@ -1,0 +1,52 @@
+.holiday {
+    color: red;
+}
+
+.storeholiday {
+    opacity: 0.4;
+}
+
+.calsize {
+    width: 435px;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid #bbb;
+    text-align: left;
+    vertical-align: top;
+    width: 70px;
+    height: 70px;
+}
+
+td:first-child {
+    color: red;
+}
+
+td:last-child {
+    color: royalblue;
+}
+
+td input {
+    border: none;
+    width:100%;
+    font-size: 90%;
+}
+
+th {
+    border: 1px solid #bbb;
+    text-align: center;
+    background-color: #ffa;
+}
+
+th:first-child {
+    color: red;
+}
+
+th:last-child {
+    color: royalblue;
+}

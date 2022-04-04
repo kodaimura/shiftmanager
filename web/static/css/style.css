@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap');
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box;
+    font-size: 18px; 
+}
+
+body {
+    font-family: "Noto Serif JP", serif !important;
+}
+
+footer{
+    position: absolute;
+    bottom: 0;
+}
+
+.datepicker,
+.table-condensed {
+  width: 350px;
+  height:350px;
+}

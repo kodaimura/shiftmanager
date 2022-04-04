@@ -1,0 +1,30 @@
+{{template "header" .}}
+<style>
+.selected {
+	background-color: #aaa;	
+}
+</style>
+<script src="https://cdn.rawgit.com/osamutake/japanese-holidays-js/v1.0.10/lib/japanese-holidays.min.js"></script>
+
+<div>
+※店休日を選択して自動作成
+<div class="my-1">
+<div class="d-flex justify-content-between calsize">
+	<h4>{{.year}}年{{.month}}月</h4>
+	<form method="POST" action="/shift/{{.year}}/{{.month}}/auto-generate">
+		<input type="hidden"id='year' name='year' value="{{.year}}">
+		<input type="hidden"id='month' name='month' value="{{.month}}">
+		<input type="hidden"id='selectdays' name='storeholiday'>
+		<button type="submit" class="btn btn-dark btn-md">自動作成</button>
+	</form>
+</div>
+</div>
+
+<div class="row">
+	<div id="calendar"></div>
+</div>
+</div>
+<a href="/" class="my-3 btn btn-outline-secondary" role="button">ホームに戻る</a>
+<link rel="stylesheet" href="/css/calendar.css">
+<script type="text/javascript" src="/js/calendar.js"></script>
+{{template "footer"}}
