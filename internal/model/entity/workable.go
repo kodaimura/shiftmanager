@@ -10,5 +10,3 @@ type Workable struct {
 	CreateAt string `db:"CREATE_AT" json:"createat"`
 	UpdateAt string `db:"UPDATE_AT" json:"updateat"`
 }
-
-//WorkableDays: 1,5,7,10,21,31

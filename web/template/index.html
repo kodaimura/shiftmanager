@@ -2,62 +2,51 @@
 <h2>{{.username}}</h2>
 <div class="table-responsive">
 <table class="table">
-	 <thead class="table-active">
+<thead class="table-active">
     <tr>
-      <th scope="col">所属</th>
-      <th scope="col">表示名</th>
-      <th scope="col">
-          <div class="d-flex justify-content-between">
-          <div>
-          役割
-          </div>
-          <div>
-          <a href="/profile">修正</a>
-          </div>
-        </div>
-      </th>
+        <th scope="col">所属</th>
+        <th scope="col">表示名</th>
+        <th scope="col">
+            <div class="d-flex justify-content-between">
+                <div>役割</div>
+                <div><a href="/profile">修正</a></div>
+            </div>
+        </th>
     </tr>
-  </thead>
-  	<tbody>
+</thead>
+<tbody>
     <tr>
-      <td>{{.profile.GroupName}}</td>
-      <td>{{.profile.AbbName}}</td>
-      <td>{{.profile.RoleName}}</td>
+        <td>{{.profile.GroupName}}</td>
+        <td>{{.profile.AbbName}}</td>
+        <td>{{.profile.RoleName}}</td>
     </tr>
-	</tbody>
+</tbody>
 </table>
 </div>
 
 <div>
-  <a id="workablelink" class="mb-1 btn btn-secondary" role="button">提出・修正</a>
+    <a id="workablelink" class="mb-1 btn btn-secondary" role="button">提出・修正</a>
 </div>
+
 <div class="table-responsive">
-<table class="table">
-  <thead class="table-active">
-    <tr>
-      <th scope="col"></th>
-      <th scope="col">
-        <div class="d-flex justify-content-between">
-          <div>
-            <span id="month">
-            </span>月 提出状況
-          </div>
-          <div>
-          </div>
-        </div>
-      
-      </th>
-    </tr>
+    <table class="table">
+    <thead class="table-active">
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">
+                <span id="month"></span>月 提出状況
+            </th>
+        </tr>
     </thead>
     <tbody>
-    {{ range .workabledays }}
-    <tr>
-      <td>{{ .AbbName }}</td>
-      <td>{{ .WorkableDays }}</td>
-    </tr>
-    {{ end }}
-  </tbody>
-</table>
+        {{ range .workabledays }}
+        <tr>
+            <td>{{ .AbbName }}</td>
+            <td>{{ .WorkableDays }}</td>
+        </tr>
+        {{ end }}
+    </tbody>
+    </table>
 </div>
 <div>
   <a id="shiftlink1" class="my-1 btn btn-primary" role="button">

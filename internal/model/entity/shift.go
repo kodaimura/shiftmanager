@@ -11,6 +11,3 @@ type Shift struct {
 	UpdateAt string `db:"UPDATE_AT" json:"updateat"`
 }
 
-//Holiday: 1,5,31 
-//Dn: AbbName,AbbName 
-

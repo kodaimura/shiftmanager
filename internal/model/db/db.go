@@ -12,6 +12,7 @@ import (
 
 var db *sql.DB
 
+
 func init() {
     var err error
 
@@ -22,6 +23,7 @@ func init() {
         log.Panic(err)
     }
 }
+
 
 func GetDB() *sql.DB {
     return db

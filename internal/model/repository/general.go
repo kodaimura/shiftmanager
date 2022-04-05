@@ -61,7 +61,6 @@ func insert(db *sql.DB, class, key1, key2, value1, value2, remarks string) {
 }
 
 
-//データ登録
 func init() {
 	db := db.GetDB()
 

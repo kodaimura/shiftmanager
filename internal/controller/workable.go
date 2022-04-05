@@ -2,9 +2,7 @@ package controller
 
 import (
     "log"
-    //"time"
     "sort"
-    //"strconv"
     "strings"
 
     "github.com/gin-gonic/gin"
@@ -35,6 +33,7 @@ func NewWorkableController() WorkableController {
     return workableController{ur, wr}
 }
 
+
 //GET /workable/:year/:month
 func (wc workableController)WorkablePage(c *gin.Context) {
     username, err := jwtauth.ExtractUserName(c)
@@ -45,10 +44,6 @@ func (wc workableController)WorkablePage(c *gin.Context) {
         return
     }
 
-    //now := time.Now()
-    //y, m, _ := now.Date()
-    //d := time.Date(y, m+1, 1, 0, 0, 0, 0, now.Location())
-    //
     year := c.Param("year")
     month := c.Param("month")
 
@@ -75,8 +70,8 @@ func (wc workableController)Workable(c *gin.Context) {
 
     w := &entity.Workable{}
     w.UId = uid
-    w.Year = c.Param("year")//c.PostForm("year")
-    w.Month = c.Param("month")//c.PostForm("month")
+    w.Year = c.Param("year")
+    w.Month = c.Param("month")
 
     wd, err := sortDays(c.PostForm("workable"))
 

@@ -38,6 +38,7 @@ func SaveShift(c *gin.Context) {
         c.Redirect(303, "/login")
         return
     }
+    
     year := c.Param("year")
     month := c.Param("month")
 

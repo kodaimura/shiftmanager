@@ -7,10 +7,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const lastDay = lastDate.getDate()
 
     document.getElementById('calendar').innerHTML = makeCalendar(startDate, lastDate)
-    reflectHolidays(year, month, lastDay)    
-    reflectShift() 
-    reflectStoreHolidays()
-    countName(lastDay)
+    reflectHolidaysToCalendar(year, month, lastDay)    
+    reflectShiftToCalendar()
+    reflectStoreHolidaysToCalendar()
+    countNames(lastDay)
     addEventToCellInput(lastDay)
 
     document.getElementById('submit').addEventListener('click',saveShift)
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 const makeCalendar = (startDate, lastDate) => {
     const startDayOfWeek = startDate.getDay()
-    const numOfDays = lastDate.getDate()
+    const lastDay = lastDate.getDate()
     let day = 1 
     let calendar = ''
     calendar += 
@@ -30,7 +30,7 @@ const makeCalendar = (startDate, lastDate) => {
         calendar += '<tr>'
 
         for (let d = 0; d < 7; d++) {
-            if (w == 0 && d < startDayOfWeek || day > numOfDays) {
+            if (w == 0 && d < startDayOfWeek || day > lastDay) {
                 calendar += '<td></td>'
             } else {
                 calendar += `<td id="d${day}">${day}
@@ -50,7 +50,7 @@ const isHoliday = (year, month, day) => {
 }
 
 
-const reflectHolidays = (year, month, lastDay) => {
+const reflectHolidaysToCalendar = (year, month, lastDay) => {
     for (let i = 1; i <= lastDay; i++) {
         if (isHoliday(year, month, i)) {
             document.getElementById(`d${i}`).classList.add('holiday')
@@ -59,7 +59,7 @@ const reflectHolidays = (year, month, lastDay) => {
 } 
 
 
-const reflectShift = () => {
+const reflectShiftToCalendar = () => {
     let shift = document.getElementById('shift').value.split(',')
     for ([i, s] of shift.entries()) {
         let input = document.getElementById(`s${i + 1}`)
@@ -70,7 +70,7 @@ const reflectShift = () => {
 }
 
 
-const reflectStoreHolidays = () => {
+const reflectStoreHolidaysToCalendar = () => {
     let storeholiday = document.getElementById('storeholiday').value.split(',')
     for (h of storeholiday) {
         let d = document.getElementById(`d${h}`)
@@ -81,7 +81,7 @@ const reflectStoreHolidays = () => {
 }
 
 
-const countName = (lastDay) => {
+const countNames = (lastDay) => {
     let counts = {}
     let str = ""
     for (let i = 1; i <= lastDay; i++){

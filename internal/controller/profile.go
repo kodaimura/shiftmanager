@@ -76,6 +76,7 @@ func (pc profileController)Profile(c *gin.Context) {
         log.Panic(err)
         return
     }
+    
     p := &entity.Profile{} 
     p.UId = uid
     p.GId = group.GId

@@ -69,7 +69,6 @@ func (sc shiftController)ShiftPage(c *gin.Context) {
         "storeholiday": shift.StoreHoliday,
         "candidate": shapeShiftToRender(&base0),
     })
-
 }
 
 
@@ -153,7 +152,6 @@ func shapeShiftToRender(shift *[31][]string) string {
             }
             csv += name
         }
-        
     }
     return csv[1:]
 }
@@ -289,6 +287,7 @@ func rolePoint(rs *[31][]string, roleMap *map[string]string) float64 {
     }
     return point
 }
+
 
 func variancePoint(rs *[31][]string, numOfMember int) float64 {
     nom := float64(numOfMember)

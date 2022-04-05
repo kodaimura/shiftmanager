@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', (event) => {
     const year = document.getElementById('year').value
     const month = document.getElementById('month').value
@@ -5,7 +6,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const lastDate = new Date(year, month, 0)
 
     document.getElementById('calendar').innerHTML = makeCalendar(startDate, lastDate)
-    reflectHolidays(startDate, lastDate)
+    reflectHolidaysToCalendar(year, month, lastDate.getDate())
+    reflectSelectDaysToCalendar(getSelectDays())
     addEventToCalendarCell(lastDate.getDate())
     addInfoToCalendarCell(startDate)
 }) 
@@ -13,7 +15,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 const makeCalendar = (startDate, lastDate) => {
     const startDayOfWeek = startDate.getDay()
-    const numOfDays = lastDate.getDate()
+    const lastDay = lastDate.getDate()
     let day = 1 
     let calendar = ''
     calendar += 
@@ -24,7 +26,7 @@ const makeCalendar = (startDate, lastDate) => {
         calendar += '<tr>'
 
         for (let d = 0; d < 7; d++) {
-            if (w == 0 && d < startDayOfWeek || day > numOfDays) {
+            if (w == 0 && d < startDayOfWeek || day > lastDay) {
                 calendar += '<td></td>'
             } else {
                 calendar += `<td id="d${day}">` + day + 
@@ -37,25 +39,28 @@ const makeCalendar = (startDate, lastDate) => {
     return calendar + '</table>'
 }
 
+
 const isHoliday = (year, month, day) => {
     const date = new Date(year, month - 1, day)
-    return JapaneseHolidays.isHoliday(date) !== undefined
+    let bool = false
+    try {
+        bool = JapaneseHolidays.isHoliday(date) !== undefined
+    }finally {
+        return bool
+    }
 }
 
 
-const reflectHolidays = (startDate, lastDate) => {
-    const year = startDate.getFullYear()
-    const month = startDate.getMonth() + 1
-    const numOfDays = lastDate.getDate()
-    for (let i = 1; i <= numOfDays; i++) {
+const reflectHolidaysToCalendar = (year, month, lastDay) => {
+    for (let i = 1; i <= lastDay; i++) {
         if (isHoliday(year, month, i)) {
             document.getElementById(`d${i}`).classList.add('holiday')
         }
-    }
-} 
+    }  
+}
 
 
-const reflectDays = (days) => {
+const reflectSelectDaysToCalendar = (days) => {
     let dayCell
     let classList
     for (d of days){
@@ -67,20 +72,22 @@ const reflectDays = (days) => {
     }
 }
 
-const getDays = () => {
+
+const getSelectDays = () => {
     days = document.getElementById('selectdays').value
     return (days === '')? [] : days.split(',')
 }
 
-const setDays = (days) => {
+
+const setSelectDays = (days) => {
     document.getElementById('selectdays').value = days.join(',')
 }
 
 
-const addEventToCalendarCell = (numOfDays) => {
-    let days = getDays()
-    for (let i = 1; i <= numOfDays; i++) {
+const addEventToCalendarCell = (lastDay) => {
+    for (let i = 1; i <= lastDay; i++) {
         document.getElementById(`d${i}`).addEventListener('click', (e) => {
+            let days = getSelectDays()
             let dayCell = document.getElementById(`d${i}`)
             let classList = dayCell.classList
             if (classList.contains('selected')) {
@@ -90,7 +97,7 @@ const addEventToCalendarCell = (numOfDays) => {
                 classList.add('selected')
                 days.push(dayCell.id.substring(1))
             }
-            setDays(days)
+            setSelectDays(days)
         })
     }
 }

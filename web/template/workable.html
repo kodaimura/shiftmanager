@@ -13,7 +13,7 @@
 	<form method="POST" action="/workable/{{.year}}/{{.month}}">
 		<input type="hidden" id='year' name='year' value="{{.year}}">
 		<input type="hidden" id='month' name='month' value="{{.month}}">
-		<input type="hidden" id='selectdays' name='workable' value={{.workable.WorkableDays}}>
+		<input type="hidden" id='selectdays' name='workable' value="{{.workable.WorkableDays}}">
 		<button type="submit" class="btn btn-primary">シフト提出</button>
 	</form>
 </div>
