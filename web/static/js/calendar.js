@@ -19,8 +19,8 @@ const makeCalendar = (startDate, lastDate) => {
     let day = 1 
     let calendar = ''
     calendar += 
-    `<table><tr><th>日</th><th>月</th><th>火</th><th>水</th>
-    <th>木</th><th>金</th><th>土</th></tr>`
+    `<table class="table"><thead class="table-secondary"><tr><th>日</th><th>月</th><th>火</th><th>水</th>
+    <th>木</th><th>金</th><th>土</th></tr></thead>`
 
     for (let w = 0; w < 6; w++) {
         calendar += '<tr>'

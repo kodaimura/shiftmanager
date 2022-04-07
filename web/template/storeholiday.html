@@ -1,7 +1,7 @@
 {{template "header" .}}
 <style>
 .selected {
-	background-color: #aaa;	
+	background-color: #aaa !important;
 }
 </style>
 <script src="https://cdn.rawgit.com/osamutake/japanese-holidays-js/v1.0.10/lib/japanese-holidays.min.js"></script>
@@ -13,19 +13,27 @@
 <div class="my-1">
 <div class="d-flex justify-content-between calsize">
 	<h4>{{.year}}年{{.month}}月</h4>
+</div>
+</div>
+
+<div id="calendar"></div>
+
+<div class="my-3">
 	<form method="POST" action="/shift/{{.year}}/{{.month}}/auto-generate">
 		<input type="hidden"id='selectdays' name='storeholiday'>
-		<button type="submit" class="btn btn-dark btn-md">自動作成</button>
+		<input type="submit" id="submit" class="btn btn-dark btn-md" value="自動作成">
 	</form>
 </div>
-</div>
 
-<div class="row">
-	<div id="calendar"></div>
-</div>
-
-<a href="/" class="my-3 btn btn-outline-secondary" role="button">ホームに戻る</a>
+<a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
 
 <link rel="stylesheet" href="/css/calendar.css">
 <script type="text/javascript" src="/js/calendar.js"></script>
+<script type="text/javascript">
+	document.getElementById("submit").addEventListener('click', (e) => {
+		event.target.style.pointerEvents = "none";
+		e.target.value = "作成中"
+	})
+</script>
+
 {{template "footer"}}

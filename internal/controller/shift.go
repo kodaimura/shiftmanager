@@ -229,7 +229,7 @@ func pickShift(base *[31][][]string, lens *[31]int, roleMap *map[string]string) 
     var max = -99999.9
     var p = 0.0
 
-    for i := 0; i < 1000000; i++ {
+    for i := 0; i < 700000; i++ {
         rs = makeRandomShift(base, lens)
         p = evaluateShift(&rs, roleMap)
 

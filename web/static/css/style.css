@@ -7,17 +7,23 @@
     font-size: 18px; 
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 body {
+    padding-bottom: 60px; 
     font-family: "Noto Serif JP", serif !important;
 }
 
-footer{
-    position: absolute;
-    bottom: 0;
+main 
+{ 
+    min-height: 100%;
+    margin-bottom: -50px;
 }
 
-.datepicker,
-.table-condensed {
-  width: 350px;
-  height:350px;
+footer, .push { 
+    height: 50px;
+    bottom: 0; 
 }

@@ -8,13 +8,8 @@
 <input type="hidden" id="storeholiday" name="storeholiday" value="{{ .storeholiday }}">
 
 <div class="mb-1">
-	<div class="d-flex justify-content-between calsize">
-		<h4>{{.year}}年{{.month}}月</h4>
-		<span id="error" class="text-danger"></span>
-		<input type="button" id="submit" class="btn btn-primary" value="保存">
-	</div>
+	<h4>{{.year}}年{{.month}}月</h4>
 </div>
-
 <div id="calendar"></div>
 
 <div class="row">
@@ -22,6 +17,11 @@
 </div>
 <div class="row text-primary">
 	<span id="message"></span>
+</div>
+
+<div class="my-3">
+	<input type="button" id="submit" class="btn btn-primary" value="保存">
+	<span id="error" class="text-danger"></span>
 </div>
 
 <div class="my-3">

@@ -10,6 +10,7 @@ import (
     _ "github.com/mattn/go-sqlite3"
 
     "shiftmanager/internal/controller"
+    "shiftmanager/internal/constants"
     "shiftmanager/internal/pkg/jwtauth"
 )
 
@@ -17,7 +18,7 @@ import (
 func Run() {
     setLogger()
     r := router()
-    r.Run()
+    r.Run(constants.Port)
 }
 
 
