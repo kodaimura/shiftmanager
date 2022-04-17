@@ -122,17 +122,17 @@ const addEventToCellInput = (lastDay) => {
         target.addEventListener('focusout', (e) => {
             document.getElementById('message').innerHTML = ""
         })
-        target.addEventListener('input', (e) => {
-            countNames(lastDay)
+        target.addEventListener('change', (e) => {
             let shift = document.getElementById('shift')
             let ls = shift.value.split(',')
             e.target.value = e.target.value.replace("　", " ").replace(",", " ")
             ls[i - 1] = e.target.value
             shift.value = ls.join(',')
-
+            console.log(e.target.value)
             let button = document.getElementById("submit")
             button.value = "保存"
             button.disabled = false
+            countNames(lastDay)
         })
     }
 }

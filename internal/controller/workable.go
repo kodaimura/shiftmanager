@@ -91,6 +91,9 @@ func (wc workableController)Workable(c *gin.Context) {
 
 
 func sortDays(csvDays string) (string, error){
+    if csvDays == "" {
+        return "", nil
+    }
     days := strings.Split(csvDays, ",")
     
     isl, err := utils.AtoiSlice(days)
