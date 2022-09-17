@@ -46,7 +46,7 @@ func (lc loginController)Login(c *gin.Context) {
     if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(ld.Password)) != nil{
         c.HTML(401, "login.html", gin.H{
             "appname":constants.AppName,
-            "error": "UsernameまたはPasswordが異なります。",
+            "error": "ユーザ名またはパスワードが異なります。",
         })
         c.Abort()
         return

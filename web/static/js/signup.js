@@ -3,7 +3,7 @@ const checkPassword = () => {
 	let pw2 = document.getElementById("pw2").value
 
 	if (pw1 !== pw2) {
-		document.getElementById("error").innerHTML = "Passwordが一致していません。"
+		document.getElementById("error").innerHTML = "パスワードが一致していません。"
 		return false
 	} else {
 		return true

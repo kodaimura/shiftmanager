@@ -42,7 +42,7 @@ func (sc signupController) Signup(c *gin.Context) {
     if _, err := sc.ur.SelectByUserName(sd.UserName); err == nil {
         c.HTML(409, "signup.html", gin.H{
             "appname": constants.AppName,
-            "error": "Usernameが既に使われています。",
+            "error": "ユーザ名が既に使われています。",
         })
         c.Abort()
         return
