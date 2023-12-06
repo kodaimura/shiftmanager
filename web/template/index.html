@@ -65,9 +65,9 @@
   `/shift/${nm.getFullYear()}/${nm.getMonth() + 1}`
 
   document.getElementById("shiftlink2").href = 
-  `/shift/${nm.getFullYear()}/${nm.getMonth()}`
+  `/shift/${date.getFullYear()}/${date.getMonth() + 1}`
 
-  document.getElementById("month").innerHTML = `${date.getMonth() + 2}`
+  document.getElementById("month").innerHTML = `${nm.getMonth() + 1}`
 </script>
 {{template "footer"}}
 
