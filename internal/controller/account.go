@@ -5,13 +5,16 @@ import (
 
 	"shiftmanager/internal/core/jwt"
 	"shiftmanager/internal/core/errs"
+	"shiftmanager/internal/core/utils"
 	"shiftmanager/internal/service"
+	"shiftmanager/internal/dto"
+	"shiftmanager/internal/request"
+	"shiftmanager/internal/response"
 )
 
 type AccountController struct {
 	accountService service.AccountService
 }
-
 
 func NewAccountController() *AccountController {
 	return &AccountController{
@@ -19,64 +22,67 @@ func NewAccountController() *AccountController {
 	}
 }
 
-
-//GET /signup
+// GET /signup
 func (ctr *AccountController) SignupPage(c *gin.Context) {
 	c.HTML(200, "signup.html", gin.H{})
 }
 
-//GET /login
+// GET /login
 func (ctr *AccountController) LoginPage(c *gin.Context) {
 	c.HTML(200, "login.html", gin.H{})
 }
 
-
-//GET /logout
+// GET /logout
 func (ctr *AccountController) Logout(c *gin.Context) {
 	jwt.RemoveTokenFromCookie(c)
 	c.Redirect(303, "/login")
 }
 
-
-//POST /api/signup
+// POST /api/signup
 func (ctr *AccountController) ApiSignup(c *gin.Context) {
-	m := map[string]string{}
-	c.BindJSON(&m)
-	name := m["account_name"]
-	pass := m["account_password"]
-
-	err := ctr.accountService.Signup(name, pass)
-	if err != nil {
-		if _, ok := err.(errs.UniqueConstraintError); ok {
-			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
-		} else {
-			c.JSON(500, gin.H{"error": "登録に失敗しました。"})
-		}
-		c.Abort()
+	var req request.Signup
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ResponseError(c, 400, "不正なリクエストです。")
 		return
 	}
-	c.JSON(200, gin.H{})
+
+	var input dto.Signup
+	utils.MapFields(&input, req)
+
+	accountId, err := ctr.accountService.Signup(input)
+	if err != nil {
+		if _, ok := err.(errs.UniqueConstraintError); ok {
+			ResponseError(c, 409, "ユーザ名が既に使われています。")
+		} else {
+			ResponseError(c, 500, "登録に失敗しました。")
+		}
+		return
+	}
+
+	res := response.Signup{Id: accountId}
+	c.JSON(200, res)
 }
 
-
-//POST /api/login
+// POST /api/login
 func (ctr *AccountController) ApiLogin(c *gin.Context) {
-	m := map[string]string{}
-	c.BindJSON(&m)
-	name := m["account_name"]
-	pass := m["account_password"]
+	var req request.Login
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ResponseError(c, 400, "不正なリクエストです。")
+		return
+	}
 
-	account, err := ctr.accountService.Login(name, pass)
+	var input dto.Login
+	utils.MapFields(&input, req)
+
+	account, err := ctr.accountService.Login(input)
 	if err != nil {
-		c.JSON(401, gin.H{"error": "ユーザ名またはパスワードが異なります。"})
-		c.Abort()
+		ResponseError(c, 401, "ユーザ名またはパスワードが異なります。")
 		return
 	}
 
 	pl, err := ctr.accountService.GenerateJwtPayload(account.Id)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "ログインに失敗しました。"})
-		c.Abort()
+		ResponseError(c, 500, "ログインに失敗しました。")
 		return
 	}
 
@@ -84,81 +90,75 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
-
-//GET /api/account/profile
-func (ctr *AccountController) ApiGetProfile(c *gin.Context) {
+// GET /api/account
+func (ctr *AccountController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	account, err := ctr.accountService.GetProfile(pl.AccountId)
+	account, err := ctr.accountService.GetOne(pl.AccountId)
 
 	if err != nil {
-		c.JSON(500, gin.H{})
-		c.Abort()
+		ResponseError(c, 500, "アカウント情報の取得に失敗しました。")
 		return
 	}
 
-	c.JSON(200, account)
+	var res response.GetAccount
+	utils.MapFields(&res, account)
+
+	c.JSON(200, res)
 }
 
-
-//PUT /api/account/password
+// PUT /api/account/password
 func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	id := pl.AccountId
-	name := pl.AccountName
 
-	m := map[string]string{}
-	c.BindJSON(&m)
-	oldPass := m["old_account_password"]
-	pass := m["account_password"]
-
-	_, err := ctr.accountService.Login(name, oldPass)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "旧パスワードが異なります。"})
-		c.Abort()
+	var req request.PutAccountPassword
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ResponseError(c, 400, "不正なリクエストです。")
 		return
 	}
 
-	if ctr.accountService.UpdatePassword(id, pass) != nil {
-		c.JSON(500, gin.H{"error": "変更に失敗しました。"})
-		c.Abort()
+	input := dto.Login{Name: pl.AccountName, Password: req.OldPassword}
+	_, err := ctr.accountService.Login(input)
+	if err != nil {
+		ResponseError(c, 400, "旧パスワードが異なります。")
+		return
+	}
+
+	if err := ctr.accountService.UpdatePassword(pl.AccountId, req.Password); err != nil {
+		ResponseError(c, 500, "変更に失敗しました。")
 		return
 	}
 
 	c.JSON(200, gin.H{})
 }
 
-
-//PUT /api/account/name
+// PUT /api/account/name
 func (ctr *AccountController) ApiPutName(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	id := pl.AccountId
 
-	m := map[string]string{}
-	c.BindJSON(&m)
-	name := m["account_name"]
+	var req request.PutAccountName
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ResponseError(c, 400, "不正なリクエストです。")
+		return
+	}
 
-	err := ctr.accountService.UpdateName(id, name)
+	err := ctr.accountService.UpdateName(pl.AccountId, req.Name)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
-			c.JSON(409, gin.H{"error": "ユーザ名が既に使われています。"})
+			ResponseError(c, 409, "ユーザ名が既に使われています。")
 		} else {
-			c.JSON(500, gin.H{"error": "変更に失敗しました。"})
+			ResponseError(c, 500, "変更に失敗しました。")
 		}
-		c.Abort()
 		return
 	}
 	c.JSON(200, gin.H{})
 }
 
-
-//DELETE /api/account
-func (ctr *AccountController) ApiDeleteAccount(c *gin.Context) {
+// DELETE /api/account
+func (ctr *AccountController) ApiDelete(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	id := pl.AccountId
 
-	if ctr.accountService.DeleteAccount(id) != nil {
-		c.JSON(500, gin.H{"error": "削除に失敗しました。"})
-		c.Abort()
+	if err := ctr.accountService.Delete(pl.AccountId); err != nil {
+		ResponseError(c, 500, "削除に失敗しました。")
 		return
 	}
 

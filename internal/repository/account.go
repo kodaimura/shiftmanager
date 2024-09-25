@@ -11,7 +11,7 @@ import (
 type AccountRepository interface {
 	Get(a *model.Account) ([]model.Account, error)
 	GetOne(a *model.Account) (model.Account, error)
-	Insert(a *model.Account, tx *sql.Tx) error
+	Insert(a *model.Account, tx *sql.Tx) (int, error)
 	Update(a *model.Account, tx *sql.Tx) error
 	Delete(a *model.Account, tx *sql.Tx) error
 }
@@ -88,26 +88,28 @@ func (rep *accountRepository) GetOne(a *model.Account) (model.Account, error) {
 }
 
 
-func (rep *accountRepository) Insert(a *model.Account, tx *sql.Tx) error {
+func (rep *accountRepository) Insert(a *model.Account, tx *sql.Tx) (int, error) {
 	cmd := 
 	`INSERT INTO account (
 		account_name
 		,account_password
-	 ) VALUES(?,?)`
+	 ) VALUES(?,?)
+	 RETURNING account_id`
 
 	binds := []interface{}{
 		a.Name,
 		a.Password,
 	}
 
+	var accountId int
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-	
-	return err
+		err = tx.QueryRow(cmd, binds...).Scan(&accountId)
+	} else {
+		err = rep.db.QueryRow(cmd, binds...).Scan(&accountId)
+	}
+
+	return accountId, err
 }
 
 
@@ -122,14 +124,14 @@ func (rep *accountRepository) Update(a *model.Account, tx *sql.Tx) error {
 		a.Password,
 		a.Id,
 	}
-	
+
 	var err error
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }
 
@@ -144,6 +146,6 @@ func (rep *accountRepository) Delete(a *model.Account, tx *sql.Tx) error {
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }

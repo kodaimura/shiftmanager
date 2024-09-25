@@ -116,11 +116,11 @@ func (rep *shiftRepository) Insert(s *model.Shift, tx *sql.Tx) error {
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-	
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
+
 	return err
 }
 
@@ -133,22 +133,23 @@ func (rep *shiftRepository) Update(s *model.Shift, tx *sql.Tx) error {
 		,month = ?
 		,store_holiday = ?
 		,shift_data = ?
-	 WHERE `
+	 WHERE group_id = ?`
 	binds := []interface{}{
 		s.GroupId,
 		s.Year,
 		s.Month,
 		s.StoreHoliday,
 		s.Data,
+		s.GroupId,
 	}
-	
+
 	var err error
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }
 
@@ -163,6 +164,6 @@ func (rep *shiftRepository) Delete(s *model.Shift, tx *sql.Tx) error {
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }

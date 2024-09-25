@@ -7,16 +7,16 @@ import (
 )
 
 
-type RootController struct {}
+type IndexController struct {}
 
 
-func NewRootController() *RootController {
-	return &RootController{}
+func NewIndexController() *IndexController {
+	return &IndexController{}
 }
 
 
 //GET /
-func (rc *RootController) IndexPage(c *gin.Context) {
+func (ctr *IndexController) IndexPage(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 	name := pl.AccountName
 

@@ -110,11 +110,11 @@ func (rep *accountProfileRepository) Insert(ap *model.AccountProfile, tx *sql.Tx
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-	
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
+
 	return err
 }
 
@@ -133,14 +133,14 @@ func (rep *accountProfileRepository) Update(ap *model.AccountProfile, tx *sql.Tx
 		ap.AccountRole,
 		ap.DisplayName,
 	}
-	
+
 	var err error
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }
 
@@ -155,6 +155,6 @@ func (rep *accountProfileRepository) Delete(ap *model.AccountProfile, tx *sql.Tx
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }

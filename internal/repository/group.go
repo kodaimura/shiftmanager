@@ -11,7 +11,7 @@ import (
 type GroupRepository interface {
 	Get(g *model.Group) ([]model.Group, error)
 	GetOne(g *model.Group) (model.Group, error)
-	Insert(g *model.Group, tx *sql.Tx) error
+	Insert(g *model.Group, tx *sql.Tx) (int, error)
 	Update(g *model.Group, tx *sql.Tx) error
 	Delete(g *model.Group, tx *sql.Tx) error
 }
@@ -84,24 +84,26 @@ func (rep *groupRepository) GetOne(g *model.Group) (model.Group, error) {
 }
 
 
-func (rep *groupRepository) Insert(g *model.Group, tx *sql.Tx) error {
+func (rep *groupRepository) Insert(g *model.Group, tx *sql.Tx) (int, error) {
 	cmd := 
 	`INSERT INTO group (
 		group_name
-	 ) VALUES(?)`
+	 ) VALUES(?)
+	 RETURNING group_id`
 
 	binds := []interface{}{
 		g.Name,
 	}
 
+	var groupId int
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-	
-	return err
+		err = tx.QueryRow(cmd, binds...).Scan(&groupId)
+	} else {
+		err = rep.db.QueryRow(cmd, binds...).Scan(&groupId)
+	}
+
+	return groupId, err
 }
 
 
@@ -114,14 +116,14 @@ func (rep *groupRepository) Update(g *model.Group, tx *sql.Tx) error {
 		g.Name,
 		g.Id,
 	}
-	
+
 	var err error
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }
 
@@ -136,6 +138,6 @@ func (rep *groupRepository) Delete(g *model.Group, tx *sql.Tx) error {
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }

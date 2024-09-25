@@ -82,6 +82,27 @@ func SetFieldValue(obj interface{}, fieldName string, newValue interface{}) erro
 }
 
 
+func MapFields(dst, src interface{}) error {
+    srcVal := reflect.ValueOf(src)
+    dstVal := reflect.ValueOf(dst).Elem()
+
+    if srcVal.Kind() != reflect.Struct || dstVal.Kind() != reflect.Struct {
+        return fmt.Errorf("src and dst must be structs")
+    }
+
+    for i := 0; i < srcVal.NumField(); i++ {
+        srcField := srcVal.Type().Field(i)
+        dstField := dstVal.FieldByName(srcField.Name)
+
+        if dstField.IsValid() && dstField.Type() == srcVal.Field(i).Type() {
+            dstField.Set(srcVal.Field(i))
+        }
+    }
+
+    return nil
+}
+
+
 func IsZero(value interface{}) bool {
 	if value == nil {
         return true

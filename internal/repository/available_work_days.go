@@ -116,11 +116,11 @@ func (rep *availableWorkDaysRepository) Insert(awd *model.AvailableWorkDays, tx 
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
-	
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
+
 	return err
 }
 
@@ -133,22 +133,27 @@ func (rep *availableWorkDaysRepository) Update(awd *model.AvailableWorkDays, tx 
 		,month = ?
 		,available_work_days = ?
 		,memo = ?
-	 WHERE `
+	 WHERE account_id = ?
+	   AND year = ?
+	   AND month = ?`
 	binds := []interface{}{
 		awd.AccountId,
 		awd.Year,
 		awd.Month,
 		awd.AvailableWorkDays,
 		awd.Memo,
+		awd.AccountId,
+		awd.Year,
+		awd.Month,
 	}
-	
+
 	var err error
 	if tx != nil {
         _, err = tx.Exec(cmd, binds...)
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }
 
@@ -163,6 +168,6 @@ func (rep *availableWorkDaysRepository) Delete(awd *model.AvailableWorkDays, tx 
     } else {
         _, err = rep.db.Exec(cmd, binds...)
     }
-	
+
 	return err
 }

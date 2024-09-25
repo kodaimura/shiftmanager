@@ -7,22 +7,21 @@ import (
 	"shiftmanager/internal/core/jwt"
 	"shiftmanager/internal/core/logger"
 	"shiftmanager/internal/core/errs"
-	"shiftmanager/internal/model"
+	"shiftmanager/internal/core/utils"
 	"shiftmanager/internal/dto"
+	"shiftmanager/internal/model"
 	"shiftmanager/internal/repository"
 )
 
-
 type AccountService interface {
-	Signup(name, password string) error
-	Login(name, password string) (dto.Account, error)
-	GetProfile(id int) (dto.Account, error)
-	GenerateJwtPayload(id int) (jwt.Payload, error)
+	GetOne(id int) (dto.Account, error)
+	Delete(id int) error
 	UpdateName(id int, name string) error
 	UpdatePassword(id int, password string) error
-	DeleteAccount(id int) error
+	Login(input dto.Login) (dto.Account, error)
+	Signup(input dto.Signup) (int, error)
+	GenerateJwtPayload(id int) (jwt.Payload, error)
 }
-
 
 type accountService struct {
 	accountRepository repository.AccountRepository
@@ -34,45 +33,8 @@ func NewAccountService() AccountService {
 	}
 }
 
-
-func (srv *accountService) toAccountDTO(account model.Account) dto.Account {
-	return dto.Account{
-		Id:        account.Id,
-		Name:      account.Name,
-		CreatedAt: account.CreatedAt,
-		UpdatedAt: account.UpdatedAt,
-	}
-}
-
-
-func (srv *accountService) Signup(name, password string) error {
-	_, err := srv.accountRepository.GetOne(&model.Account{Name: name})
-	if err == nil {
-		return errs.NewUniqueConstraintError("account_name")
-	}
-
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
-	var account model.Account
-	account.Name = name
-	account.Password = string(hashed)
-
-	err = srv.accountRepository.Insert(&account, nil);
-	if err != nil {
-		logger.Error(err.Error())
-	}
-
-	return err
-}
-
-
-func (srv *accountService) Login(name, password string) (dto.Account, error) {
-	account, err := srv.accountRepository.GetOne(&model.Account{Name: name})
+func (srv *accountService) GetOne(id int) (dto.Account, error) {
+	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
@@ -82,94 +44,111 @@ func (srv *accountService) Login(name, password string) (dto.Account, error) {
 		return dto.Account{}, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(password))
-	if err != nil {
-		logger.Error(err.Error())
-	}
-
-	return srv.toAccountDTO(account), err
+	var ret dto.Account
+	utils.MapFields(&ret, account)
+	return ret, nil
 }
 
+func (srv *accountService) UpdateName(id int, name string) error {
+	if err := srv.checkUniqueName(id, name); err != nil {
+		return err
+	}
 
-func (srv *accountService) GetProfile(id int) (dto.Account, error) {
-	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
+	account, err := srv.getAccountByID(id)
+	if err != nil {
+		return err
+	}
+
+	account.Name = name
+	return srv.accountRepository.Update(account, nil)
+}
+
+func (srv *accountService) UpdatePassword(id int, password string) error {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	account, err := srv.getAccountByID(id)
+	if err != nil {
+		return err
+	}
+
+	account.Password = string(hashed)
+	return srv.accountRepository.Update(account, nil)
+}
+
+func (srv *accountService) Delete(id int) error {
+	return srv.accountRepository.Delete(&model.Account{Id: id}, nil)
+}
+
+func (srv *accountService) Login(input dto.Login) (dto.Account, error) {
+	account, err := srv.accountRepository.GetOne(&model.Account{Name: input.Name})
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
 		} else {
 			logger.Error(err.Error())
 		}
+		return dto.Account{}, err
 	}
 
-	return srv.toAccountDTO(account), err
+	if err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(input.Password)); err != nil {
+		logger.Error(err.Error())
+		return dto.Account{}, err
+	}
+
+	var ret dto.Account
+	utils.MapFields(&ret, account)
+	return ret, nil
 }
 
+func (srv *accountService) Signup(input dto.Signup) (int, error) {
+	if _, err := srv.accountRepository.GetOne(&model.Account{Name: input.Name}); err == nil {
+		return 0, errs.NewUniqueConstraintError("account_name")
+	}
 
-func (srv *accountService) GenerateJwtPayload(id int) (jwt.Payload, error) {
-	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
+	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error(err.Error())
+		return 0, err
+	}
+
+	account := &model.Account{
+		Name:     input.Name,
+		Password: string(hashed),
+	}
+
+	return srv.accountRepository.Insert(account, nil)
+}
+
+func (srv *accountService) GenerateJwtPayload(id int) (jwt.Payload, error) {
+	account, err := srv.getAccountByID(id)
+	if err != nil {
 		return jwt.Payload{}, err
 	}
 
-	var cc jwt.CustomClaims
-	cc.AccountId = account.Id
-	cc.AccountName = account.Name
+	cc := jwt.CustomClaims{
+		AccountId:   account.Id,
+		AccountName: account.Name,
+	}
 	return jwt.NewPayload(cc), nil
 }
 
-
-func (srv *accountService) UpdateName(id int, name string) error {
-	u, err := srv.accountRepository.GetOne(&model.Account{Name: name})
-	if err == nil && u.Id != id{
+func (srv *accountService) checkUniqueName(id int, name string) error {
+	existingAccount, err := srv.accountRepository.GetOne(&model.Account{Name: name})
+	if err == nil && existingAccount.Id != id {
 		return errs.NewUniqueConstraintError("account_name")
 	}
-
-	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
-	account.Name = name
-	if err = srv.accountRepository.Update(&account, nil); err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
 	return nil
 }
 
-
-func (srv *accountService) UpdatePassword(id int, password string) error {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
+func (srv *accountService) getAccountByID(id int) (*model.Account, error) {
 	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
 	if err != nil {
 		logger.Error(err.Error())
-		return err
+		return nil, err
 	}
-
-	account.Password = string(hashed)
-	if err = srv.accountRepository.Update(&account, nil); err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
-	return nil
-}
-
-
-func (srv *accountService) DeleteAccount(id int) error {
-	if err := srv.accountRepository.Delete(&model.Account{Id: id}, nil); err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
-	return nil
+	return &account, nil
 }
