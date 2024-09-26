@@ -5,9 +5,96 @@
 {{template "header" .}}
 
 <main class="container">
-    <h2>{{.account_name}} さん</h2>
+<h2>{{.account_name}}</h2>
+<div class="table-responsive">
+<table class="table">
+<thead class="table-active">
+    <tr>
+        <th scope="col">表示名</th>
+        <th scope="col">
+            <div class="d-flex justify-content-between">
+                <div>役割</div>
+                <div><a href="/account_profile">プロフ登録</a></div>
+            </div>
+        </th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td></td>
+        <td></td>
+    </tr>
+</tbody>
+</table>
+</div>
+<div class="container">
+    <div class="d-flex align-items-center justify-content-center my-4">
+        <button class="btn btn-outline-dark me-3 fs-3" id="prev-month">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div class="border border-secondary rounded p-2 text-center fw-bold fs-3">
+            <span id="year"></span>年<span id="month"></span>月
+        </div>
+        <button class="btn btn-outline-dark ms-3 fs-3" id="next-month">
+            <i class="bi bi-arrow-right"></i>
+        </button>
+    </div>
+</div>
+<div>
+    <a id="shift-preferred" class="mb-1 btn btn-secondary" role="button">シフト希望日登録</a>
+</div>
+
+<div>
+    <a id="shift-generate" class="mb-1 btn btn-secondary" role="button">シフト作成</a>
+</div>
+<div>
+    <a id="shift-edit" class="mb-1 btn btn-secondary" role="button">シフト編集</a>
+</div>
 </main>
 
 {{template "footer" .}}
+<script>
+    const yearDisplay = document.getElementById('year');
+    const monthDisplay = document.getElementById('month');
+    const prevButton = document.getElementById('prev-month');
+    const nextButton = document.getElementById('next-month');
+
+    const getJaTime = () => {
+        const date = new Date();
+        const utcOffset = date.getTimezoneOffset() * 60000;
+        const jaTime = new Date(date.getTime() + utcOffset + 9 * 3600000);
+        return jaTime;
+    };
+
+    let displayedDate = new Date(getJaTime().getFullYear(), getJaTime().getMonth() + 1);
+
+    const renderMonth = () => {
+        yearDisplay.textContent = displayedDate.getFullYear();
+        monthDisplay.textContent = displayedDate.getMonth() + 1
+    };
+
+    const updateLinks = () => {
+        const year = displayedDate.getFullYear();
+        const month = displayedDate.getMonth() + 1
+        document.getElementById('shift-preferred').href = `/shift_preferred/${year}/${month}`
+        document.getElementById('shift-generate').href = `/shift/${year}/${month}/generate`
+        document.getElementById('shift-edit').href = `/shift/${year}/${month}/edit`
+    };
+
+    prevButton.addEventListener('click', () => {
+        displayedDate.setMonth(displayedDate.getMonth() - 1);
+        renderMonth();
+        updateLinks();
+    });
+
+    nextButton.addEventListener('click', () => {
+        displayedDate.setMonth(displayedDate.getMonth() + 1);
+        renderMonth();
+        updateLinks();
+    });
+
+    renderMonth();
+    updateLinks();
+</script>
 </body>
 </html>
