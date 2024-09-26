@@ -14,7 +14,7 @@ func SetWebRouter(r *gin.RouterGroup) {
 	ic := controller.NewIndexController()
 	ac := controller.NewAccountController()
 
-	r.GET("/signup", ac.SignupPage)
+	r.GET("/signup", middleware.BasicAuthMiddleware(), ac.SignupPage)
 	r.GET("/login", ac.LoginPage)
 	r.GET("/logout", ac.Logout)
 

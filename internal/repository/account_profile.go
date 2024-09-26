@@ -32,7 +32,6 @@ func (rep *accountProfileRepository) Get(ap *model.AccountProfile) ([]model.Acco
 	query := 
 	`SELECT
 		account_id
-		,group_id
 		,account_role
 		,display_name
 		,created_at
@@ -50,7 +49,6 @@ func (rep *accountProfileRepository) Get(ap *model.AccountProfile) ([]model.Acco
 		ap := model.AccountProfile{}
 		err = rows.Scan(
 			&ap.AccountId,
-			&ap.GroupId,
 			&ap.AccountRole,
 			&ap.DisplayName,
 			&ap.CreatedAt,
@@ -72,7 +70,6 @@ func (rep *accountProfileRepository) GetOne(ap *model.AccountProfile) (model.Acc
 	query := 
 	`SELECT
 		account_id
-		,group_id
 		,account_role
 		,display_name
 		,created_at
@@ -81,7 +78,6 @@ func (rep *accountProfileRepository) GetOne(ap *model.AccountProfile) (model.Acc
 
 	err := rep.db.QueryRow(query, binds...).Scan(
 		&ret.AccountId,
-		&ret.GroupId,
 		&ret.AccountRole,
 		&ret.DisplayName,
 		&ret.CreatedAt,
@@ -96,14 +92,12 @@ func (rep *accountProfileRepository) Insert(ap *model.AccountProfile, tx *sql.Tx
 	cmd := 
 	`INSERT INTO account_profile (
 		account_id
-		,group_id
 		,account_role
 		,display_name
-	 ) VALUES(?,?,?,?)`
+	 ) VALUES(?,?,?)`
 
 	binds := []interface{}{
 		ap.AccountId,
-		ap.GroupId,
 		ap.AccountRole,
 		ap.DisplayName,
 	}
@@ -123,13 +117,11 @@ func (rep *accountProfileRepository) Update(ap *model.AccountProfile, tx *sql.Tx
 	cmd := 
 	`UPDATE account_profile
 	 SET account_id = ?
-		,group_id = ?
 		,account_role = ?
 		,display_name = ?
 	 WHERE `
 	binds := []interface{}{
 		ap.AccountId,
-		ap.GroupId,
 		ap.AccountRole,
 		ap.DisplayName,
 	}

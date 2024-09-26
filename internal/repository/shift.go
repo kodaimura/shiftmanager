@@ -31,8 +31,7 @@ func (rep *shiftRepository) Get(s *model.Shift) ([]model.Shift, error) {
 	where, binds := db.BuildWhereClause(s)
 	query := 
 	`SELECT
-		group_id
-		,year
+		year
 		,month
 		,store_holiday
 		,shift_data
@@ -50,7 +49,6 @@ func (rep *shiftRepository) Get(s *model.Shift) ([]model.Shift, error) {
 	for rows.Next() {
 		s := model.Shift{}
 		err = rows.Scan(
-			&s.GroupId,
 			&s.Year,
 			&s.Month,
 			&s.StoreHoliday,
@@ -73,8 +71,7 @@ func (rep *shiftRepository) GetOne(s *model.Shift) (model.Shift, error) {
 	where, binds := db.BuildWhereClause(s)
 	query := 
 	`SELECT
-		group_id
-		,year
+		year
 		,month
 		,store_holiday
 		,shift_data
@@ -83,7 +80,6 @@ func (rep *shiftRepository) GetOne(s *model.Shift) (model.Shift, error) {
 	 FROM shift ` + where
 
 	err := rep.db.QueryRow(query, binds...).Scan(
-		&ret.GroupId,
 		&ret.Year,
 		&ret.Month,
 		&ret.StoreHoliday,
@@ -99,15 +95,13 @@ func (rep *shiftRepository) GetOne(s *model.Shift) (model.Shift, error) {
 func (rep *shiftRepository) Insert(s *model.Shift, tx *sql.Tx) error {
 	cmd := 
 	`INSERT INTO shift (
-		group_id
-		,year
+		year
 		,month
 		,store_holiday
 		,shift_data
-	 ) VALUES(?,?,?,?,?)`
+	 ) VALUES(?,?,?,?)`
 
 	binds := []interface{}{
-		s.GroupId,
 		s.Year,
 		s.Month,
 		s.StoreHoliday,
@@ -128,19 +122,19 @@ func (rep *shiftRepository) Insert(s *model.Shift, tx *sql.Tx) error {
 func (rep *shiftRepository) Update(s *model.Shift, tx *sql.Tx) error {
 	cmd := 
 	`UPDATE shift
-	 SET group_id = ?
-		,year = ?
+	 SET year = ?
 		,month = ?
 		,store_holiday = ?
 		,shift_data = ?
-	 WHERE group_id = ?`
+	 WHERE year = ?
+	   AND month = ?`
 	binds := []interface{}{
-		s.GroupId,
 		s.Year,
 		s.Month,
 		s.StoreHoliday,
 		s.Data,
-		s.GroupId,
+		s.Year,
+		s.Month,
 	}
 
 	var err error
