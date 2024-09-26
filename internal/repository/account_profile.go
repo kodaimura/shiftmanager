@@ -116,14 +116,13 @@ func (rep *accountProfileRepository) Insert(ap *model.AccountProfile, tx *sql.Tx
 func (rep *accountProfileRepository) Update(ap *model.AccountProfile, tx *sql.Tx) error {
 	cmd := 
 	`UPDATE account_profile
-	 SET account_id = ?
-		,account_role = ?
+	 SET account_role = ?
 		,display_name = ?
-	 WHERE `
+	 WHERE account_id = ?`
 	binds := []interface{}{
-		ap.AccountId,
 		ap.AccountRole,
 		ap.DisplayName,
+		ap.AccountId,
 	}
 
 	var err error
