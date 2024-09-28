@@ -13,6 +13,7 @@ import (
 func SetWebRouter(r *gin.RouterGroup) {
 	ic := controller.NewIndexController()
 	ac := controller.NewAccountController()
+	apc := controller.NewAccountProfileController()
 
 	r.GET("/signup", middleware.BasicAuthMiddleware(), ac.SignupPage)
 	r.GET("/login", ac.LoginPage)
@@ -21,6 +22,8 @@ func SetWebRouter(r *gin.RouterGroup) {
 	auth := r.Group("", middleware.JwtAuthMiddleware())
 	{
 		auth.GET("/", ic.IndexPage)
+		auth.GET("/account_profile", apc.AccountProfilePage)
+		auth.POST("/account_profile", apc.PostAccountProfile)
 	}
 }
 

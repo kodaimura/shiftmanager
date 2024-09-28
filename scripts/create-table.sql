@@ -62,6 +62,6 @@ CREATE TABLE IF NOT EXISTS shift_preferred (
 CREATE TRIGGER IF NOT EXISTS trg_shift_preferred_upd AFTER UPDATE ON shift_preferred
 BEGIN
 	UPDATE shift_preferred
-		SET updated_at = DATETIME('now', 'localtime') 
-		WHERE rowid == NEW.rowid;
+	SET updated_at = DATETIME('now', 'localtime') 
+	WHERE rowid == NEW.rowid;
 END;
