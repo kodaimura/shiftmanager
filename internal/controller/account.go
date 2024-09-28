@@ -42,7 +42,7 @@ func (ctr *AccountController) Logout(c *gin.Context) {
 func (ctr *AccountController) ApiSignup(c *gin.Context) {
 	var req request.Signup
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ResponseError(c, 400, "不正なリクエストです。")
+		JsonError(c, 400, "不正なリクエストです。")
 		return
 	}
 
@@ -52,9 +52,9 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 	accountId, err := ctr.accountService.Signup(input)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
-			ResponseError(c, 409, "ユーザ名が既に使われています。")
+			JsonError(c, 409, "ユーザ名が既に使われています。")
 		} else {
-			ResponseError(c, 500, "登録に失敗しました。")
+			JsonError(c, 500, "登録に失敗しました。")
 		}
 		return
 	}
@@ -67,7 +67,7 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 func (ctr *AccountController) ApiLogin(c *gin.Context) {
 	var req request.Login
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ResponseError(c, 400, "不正なリクエストです。")
+		JsonError(c, 400, "不正なリクエストです。")
 		return
 	}
 
@@ -76,13 +76,13 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 
 	account, err := ctr.accountService.Login(input)
 	if err != nil {
-		ResponseError(c, 401, "ユーザ名またはパスワードが異なります。")
+		JsonError(c, 401, "ユーザ名またはパスワードが異なります。")
 		return
 	}
 
 	pl, err := ctr.accountService.GenerateJwtPayload(account.Id)
 	if err != nil {
-		ResponseError(c, 500, "ログインに失敗しました。")
+		JsonError(c, 500, "ログインに失敗しました。")
 		return
 	}
 
@@ -96,7 +96,7 @@ func (ctr *AccountController) ApiGetOne(c *gin.Context) {
 	account, err := ctr.accountService.GetOne(pl.AccountId)
 
 	if err != nil {
-		ResponseError(c, 500, "アカウント情報の取得に失敗しました。")
+		JsonError(c, 500, "アカウント情報の取得に失敗しました。")
 		return
 	}
 
@@ -112,19 +112,19 @@ func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 
 	var req request.PutAccountPassword
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ResponseError(c, 400, "不正なリクエストです。")
+		JsonError(c, 400, "不正なリクエストです。")
 		return
 	}
 
 	input := dto.Login{Name: pl.AccountName, Password: req.OldPassword}
 	_, err := ctr.accountService.Login(input)
 	if err != nil {
-		ResponseError(c, 400, "旧パスワードが異なります。")
+		JsonError(c, 400, "旧パスワードが異なります。")
 		return
 	}
 
 	if err := ctr.accountService.UpdatePassword(pl.AccountId, req.Password); err != nil {
-		ResponseError(c, 500, "変更に失敗しました。")
+		JsonError(c, 500, "変更に失敗しました。")
 		return
 	}
 
@@ -137,16 +137,16 @@ func (ctr *AccountController) ApiPutName(c *gin.Context) {
 
 	var req request.PutAccountName
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ResponseError(c, 400, "不正なリクエストです。")
+		JsonError(c, 400, "不正なリクエストです。")
 		return
 	}
 
 	err := ctr.accountService.UpdateName(pl.AccountId, req.Name)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
-			ResponseError(c, 409, "ユーザ名が既に使われています。")
+			JsonError(c, 409, "ユーザ名が既に使われています。")
 		} else {
-			ResponseError(c, 500, "変更に失敗しました。")
+			JsonError(c, 500, "変更に失敗しました。")
 		}
 		return
 	}
@@ -158,7 +158,7 @@ func (ctr *AccountController) ApiDelete(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
 	if err := ctr.accountService.Delete(pl.AccountId); err != nil {
-		ResponseError(c, 500, "削除に失敗しました。")
+		JsonError(c, 500, "削除に失敗しました。")
 		return
 	}
 

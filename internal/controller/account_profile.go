@@ -46,7 +46,7 @@ func (ctr *AccountProfileController) PostAccountProfile(c *gin.Context) {
 
 	var req request.PostAccountProfile
 	if err := c.ShouldBind(&req); err != nil {
-		ResponseError(c, 400, "不正なリクエストです。")
+		JsonError(c, 400, "不正なリクエストです。")
 		return
 	}
 
