@@ -1,34 +1,31 @@
 <!DOCTYPE html>
 <html>
 {{template "head" .}}
+
 <body>
 {{template "header" .}}
 
 <main class="container">
-<h2>{{.account_name}}</h2>
-<div class="table-responsive">
-<table class="table">
-<thead class="table-active">
-    <tr>
-        <th scope="col">表示名</th>
-        <th scope="col">
-            <div class="d-flex justify-content-between">
-                <div>役割</div>
-                <div><a href="/account_profile">プロフ登録</a></div>
-            </div>
-        </th>
-    </tr>
-</thead>
-<tbody>
-    <tr>
-        <td></td>
-        <td></td>
-    </tr>
-</tbody>
-</table>
-</div>
-<div class="container">
-    <div class="d-flex align-items-center justify-content-center my-4">
+    <h2>{{.account_name}}</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="table-active">
+                <tr>
+                    <th>表示名</th>
+                    <th>役割</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="display_name"></td>
+                    <td id="account_role"></td>
+                    <td><a href="/account_profile">プロフ登録</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex align-items-center justify-content-center my-1">
         <button class="btn btn-outline-dark me-3 fs-3" id="prev-month">
             <i class="bi bi-arrow-left"></i>
         </button>
@@ -39,17 +36,16 @@
             <i class="bi bi-arrow-right"></i>
         </button>
     </div>
-</div>
-<div>
-    <a id="shift-preferred" class="mb-1 btn btn-secondary" role="button">シフト希望日登録</a>
-</div>
+    <div>
+        <a id="shift-preferred" class="mb-1 btn btn-secondary">シフト希望日登録</a>
+    </div>
 
-<div>
-    <a id="shift-generate" class="mb-1 btn btn-secondary" role="button">シフト作成</a>
-</div>
-<div>
-    <a id="shift-edit" class="mb-1 btn btn-secondary" role="button">シフト編集</a>
-</div>
+    <div>
+        <a id="shift-generate" class="mb-1 btn btn-secondary">シフト作成</a>
+    </div>
+    <div>
+        <a id="shift-edit" class="mb-1 btn btn-secondary">シフト編集</a>
+    </div>
 </main>
 
 {{template "footer" .}}
@@ -64,14 +60,14 @@
         const utcOffset = date.getTimezoneOffset() * 60000;
         const jaTime = new Date(date.getTime() + utcOffset + 9 * 3600000);
         return jaTime;
-    };
+     };
 
     let displayedDate = new Date(getJaTime().getFullYear(), getJaTime().getMonth() + 1);
 
-    const renderMonth = () => {
-        yearDisplay.textContent = displayedDate.getFullYear();
-        monthDisplay.textContent = displayedDate.getMonth() + 1
-    };
+     const renderMonth = () => {
+         yearDisplay.textContent = displayedDate.getFullYear();
+         monthDisplay.textContent = displayedDate.getMonth() + 1
+     };
 
     const updateLinks = () => {
         const year = displayedDate.getFullYear();
@@ -96,5 +92,7 @@
     renderMonth();
     updateLinks();
 </script>
+<script type="module" src="/js/index.js"></script>
 </body>
+
 </html>
