@@ -23,7 +23,6 @@ func SetWebRouter(r *gin.RouterGroup) {
 	{
 		auth.GET("/", ic.IndexPage)
 		auth.GET("/account_profile", apc.AccountProfilePage)
-		auth.POST("/account_profile", apc.PostAccountProfile)
 	}
 }
 
@@ -33,6 +32,7 @@ func SetWebRouter(r *gin.RouterGroup) {
 */
 func SetApiRouter(r *gin.RouterGroup) {
 	ac := controller.NewAccountController()
+	apc := controller.NewAccountProfileController()
 
 	r.POST("/signup", ac.ApiSignup)
 	r.POST("/login", ac.ApiLogin)
@@ -43,5 +43,8 @@ func SetApiRouter(r *gin.RouterGroup) {
 		auth.PUT("/account/name", ac.ApiPutName)
 		auth.PUT("/account/password", ac.ApiPutPassword)
 		auth.DELETE("/account", ac.ApiDelete)
+
+		auth.GET("/account_profile", apc.ApiGetOne)
+		auth.POST("/account_profile", apc.ApiPost)
 	}
 }

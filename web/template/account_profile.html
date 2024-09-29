@@ -6,12 +6,12 @@
 
 <main class="container">
 <h3>プロフィール設定</h3>
-<form method="POST">
+<form onsubmit="return false" id="profile-form">
 	<div class="row">
 		<div class="col-sm">
     	<div class="mb-3">
     		<label for="display_name" class="form-label">略名 (カレンダー表示用)</label>
-    		<input type="text" class="form-control form-control" name="display_name" value="{{.display_name}}" maxlength="1" required>
+    		<input type="text" class="form-control form-control" name="display_name" maxlength="1" required>
     		<div class="form-text">イニシャル等。1文字。他のメンバーと被らないように。</div>
     	</div>
    		</div>
@@ -19,20 +19,20 @@
     	<div class="col-sm">
     	<div class="mb-3">
     	<label for="account_role" class="form-label">役割</label>
-    	<select class="form-select form-select" name="account_role" value="{{.account_role}}" required>
+    	<select class="form-select form-select" name="account_role" required>
     		<option value="1">キッチン</option>
     		<option value="2">ホール</option>
     		<option value="3">キッチン・ホール</option>
 		</select>
-        <div>{{.error}}</div>
 		<div class="form-text">新人さんは教わった方を選択して下さい。</div>
 		</div>
 		</div>
 	</div>
-    <button type="submit" class="btn btn-primary btn-md">登録</button>
+    <button class="btn btn-primary btn-md" id="save">登録</button>
 </form>
 <a href="/" class="my-3 btn btn-outline-secondary" role="button">ホームに戻る</a>
 </main>
 {{template "footer"}}
+<script type="module" src="/js/account_profile.js"></script>
 </body>
 </html>
