@@ -8,6 +8,10 @@ type Account struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type AccountPK struct {
+	Id int `json:"account_id"`
+}
+
 type Signup struct {
 	Name string `json:"account_name"`
 	Password string `json:"account_password"`
@@ -15,5 +19,15 @@ type Signup struct {
 
 type Login struct {
 	Name string `json:"account_name"`
+	Password string `json:"account_password"`
+}
+
+type UpdateAccountName struct {
+	Id int `json:"account_id"`
+	Name string `json:"account_name"`
+}
+
+type UpdateAccountPassword struct {
+	Id int `json:"account_id"`
 	Password string `json:"account_password"`
 }

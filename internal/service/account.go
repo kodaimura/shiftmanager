@@ -14,13 +14,13 @@ import (
 )
 
 type AccountService interface {
-	GetOne(id int) (dto.Account, error)
-	Delete(id int) error
-	UpdateName(id int, name string) error
-	UpdatePassword(id int, password string) error
+	GetOne(input dto.AccountPK) (dto.Account, error)
+	Delete(input dto.AccountPK) error
+	UpdateName(input dto.UpdateAccountName) error
+	UpdatePassword(input dto.UpdateAccountPassword) error
 	Login(input dto.Login) (dto.Account, error)
-	Signup(input dto.Signup) (int, error)
-	GenerateJwtPayload(id int) (jwt.Payload, error)
+	Signup(input dto.Signup) (dto.AccountPK, error)
+	GenerateJwtPayload(input dto.AccountPK) (jwt.Payload, error)
 }
 
 type accountService struct {
@@ -33,8 +33,8 @@ func NewAccountService() AccountService {
 	}
 }
 
-func (srv *accountService) GetOne(id int) (dto.Account, error) {
-	account, err := srv.accountRepository.GetOne(&model.Account{Id: id})
+func (srv *accountService) GetOne(input dto.AccountPK) (dto.Account, error) {
+	account, err := srv.accountRepository.GetOne(&model.Account{Id: input.Id})
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
@@ -49,28 +49,28 @@ func (srv *accountService) GetOne(id int) (dto.Account, error) {
 	return ret, nil
 }
 
-func (srv *accountService) UpdateName(id int, name string) error {
-	if err := srv.checkUniqueName(id, name); err != nil {
+func (srv *accountService) UpdateName(input dto.UpdateAccountName) error {
+	if err := srv.checkUniqueName(input.Id, input.Name); err != nil {
 		return err
 	}
 
-	account, err := srv.getAccountByID(id)
+	account, err := srv.getAccountByID(input.Id)
 	if err != nil {
 		return err
 	}
 
-	account.Name = name
+	account.Name = input.Name
 	return srv.accountRepository.Update(account, nil)
 }
 
-func (srv *accountService) UpdatePassword(id int, password string) error {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func (srv *accountService) UpdatePassword(input dto.UpdateAccountPassword) error {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error(err.Error())
 		return err
 	}
 
-	account, err := srv.getAccountByID(id)
+	account, err := srv.getAccountByID(input.Id)
 	if err != nil {
 		return err
 	}
@@ -79,8 +79,8 @@ func (srv *accountService) UpdatePassword(id int, password string) error {
 	return srv.accountRepository.Update(account, nil)
 }
 
-func (srv *accountService) Delete(id int) error {
-	return srv.accountRepository.Delete(&model.Account{Id: id}, nil)
+func (srv *accountService) Delete(input dto.AccountPK) error {
+	return srv.accountRepository.Delete(&model.Account{Id: input.Id}, nil)
 }
 
 func (srv *accountService) Login(input dto.Login) (dto.Account, error) {
@@ -104,15 +104,15 @@ func (srv *accountService) Login(input dto.Login) (dto.Account, error) {
 	return ret, nil
 }
 
-func (srv *accountService) Signup(input dto.Signup) (int, error) {
+func (srv *accountService) Signup(input dto.Signup) (dto.AccountPK, error) {
 	if _, err := srv.accountRepository.GetOne(&model.Account{Name: input.Name}); err == nil {
-		return 0, errs.NewUniqueConstraintError("account_name")
+		return dto.AccountPK{}, errs.NewUniqueConstraintError("account_name")
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Error(err.Error())
-		return 0, err
+		return dto.AccountPK{}, err
 	}
 
 	account := &model.Account{
@@ -120,11 +120,16 @@ func (srv *accountService) Signup(input dto.Signup) (int, error) {
 		Password: string(hashed),
 	}
 
-	return srv.accountRepository.Insert(account, nil)
+	id, err := srv.accountRepository.Insert(account, nil)
+	if err != nil {
+		return dto.AccountPK{}, err
+	}
+
+	return dto.AccountPK{Id: id}, nil
 }
 
-func (srv *accountService) GenerateJwtPayload(id int) (jwt.Payload, error) {
-	account, err := srv.getAccountByID(id)
+func (srv *accountService) GenerateJwtPayload(input dto.AccountPK) (jwt.Payload, error) {
+	account, err := srv.getAccountByID(input.Id)
 	if err != nil {
 		return jwt.Payload{}, err
 	}

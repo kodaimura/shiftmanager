@@ -49,7 +49,7 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 	var input dto.Signup
 	utils.MapFields(&input, req)
 
-	accountId, err := ctr.accountService.Signup(input)
+	pk, err := ctr.accountService.Signup(input)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			JsonError(c, 409, "ユーザ名が既に使われています。")
@@ -59,7 +59,8 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 		return
 	}
 
-	res := response.Signup{Id: accountId}
+	var res response.AccountPK
+	utils.MapFields(&res, pk)
 	c.JSON(200, res)
 }
 
@@ -80,7 +81,7 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 		return
 	}
 
-	pl, err := ctr.accountService.GenerateJwtPayload(account.Id)
+	pl, err := ctr.accountService.GenerateJwtPayload(dto.AccountPK{Id: account.Id})
 	if err != nil {
 		JsonError(c, 500, "ログインに失敗しました。")
 		return
@@ -93,7 +94,7 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 // GET /api/account
 func (ctr *AccountController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	account, err := ctr.accountService.GetOne(pl.AccountId)
+	account, err := ctr.accountService.GetOne(dto.AccountPK{Id: pl.AccountId})
 
 	if err != nil {
 		JsonError(c, 500, "アカウント情報の取得に失敗しました。")
@@ -116,14 +117,17 @@ func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 		return
 	}
 
-	input := dto.Login{Name: pl.AccountName, Password: req.OldPassword}
-	_, err := ctr.accountService.Login(input)
+	_, err := ctr.accountService.Login(dto.Login{Name: pl.AccountName, Password: req.OldPassword})
 	if err != nil {
 		JsonError(c, 400, "旧パスワードが異なります。")
 		return
 	}
 
-	if err := ctr.accountService.UpdatePassword(pl.AccountId, req.Password); err != nil {
+	var input dto.UpdateAccountPassword
+	utils.MapFields(&input, req)
+	input.Id = pl.AccountId
+
+	if err := ctr.accountService.UpdatePassword(input); err != nil {
 		JsonError(c, 500, "変更に失敗しました。")
 		return
 	}
@@ -141,7 +145,11 @@ func (ctr *AccountController) ApiPutName(c *gin.Context) {
 		return
 	}
 
-	err := ctr.accountService.UpdateName(pl.AccountId, req.Name)
+	var input dto.UpdateAccountName
+	utils.MapFields(&input, req)
+	input.Id = pl.AccountId
+
+	err := ctr.accountService.UpdateName(input)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			JsonError(c, 409, "ユーザ名が既に使われています。")
@@ -157,7 +165,7 @@ func (ctr *AccountController) ApiPutName(c *gin.Context) {
 func (ctr *AccountController) ApiDelete(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
-	if err := ctr.accountService.Delete(pl.AccountId); err != nil {
+	if err := ctr.accountService.Delete(dto.AccountPK{Id: pl.AccountId}); err != nil {
 		JsonError(c, 500, "削除に失敗しました。")
 		return
 	}

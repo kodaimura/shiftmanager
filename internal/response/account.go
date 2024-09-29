@@ -8,6 +8,6 @@ type GetAccount struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-type Signup struct {
+type AccountPK struct {
 	Id int `json:"account_id"`
 }
