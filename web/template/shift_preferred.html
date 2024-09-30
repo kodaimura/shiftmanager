@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+{{template "head" .}}
+
+<style>
+.selected {
+    background-color: yellow !important;
+}
+</style>
+<script src="https://cdn.rawgit.com/osamutake/japanese-holidays-js/v1.0.10/lib/japanese-holidays.min.js"></script>
+<body>
+{{template "header" .}}
+
+<main class="container">
+<h3>出勤可能日</h3>
+<div class="mb-1">
+	<h4>年月</h4>
+</div>
+<div id="calendar"></div>
+※グレー数字 ... 自分含めた提出人数
+
+<div class="my-3">
+<form method="POST" action="/workable/{{.year}}/{{.month}}">
+	<input type="hidden" id='year' name='year' value="{{.year}}">
+	<input type="hidden" id='month' name='month' value="{{.month}}">
+	<input type="hidden" id='selectdays' name='workable' value="{{.workable.WorkableDays}}">
+	<button type="submit" class="btn btn-primary btn">シフト提出</button>
+</form>
+</div>
+<a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
+</main>
+
+{{template "footer"}}
+<link rel="stylesheet" href="/css/calendar.css">
+<script type="module" src="/js/calendar.js"></script>
+</body>
+</html>
