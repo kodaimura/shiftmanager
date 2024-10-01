@@ -3,12 +3,12 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 
-	//"shiftmanager/internal/core/jwt"
-	//"shiftmanager/internal/core/utils"
+	"shiftmanager/internal/core/jwt"
+	"shiftmanager/internal/core/utils"
 	"shiftmanager/internal/service"
-	//"shiftmanager/internal/dto"
-	//"shiftmanager/internal/request"
-	//"shiftmanager/internal/response"
+	"shiftmanager/internal/dto"
+	"shiftmanager/internal/request"
+	"shiftmanager/internal/response"
 )
 
 type ShiftPreferredController struct {
@@ -27,7 +27,7 @@ func (ctr *ShiftPreferredController) ShiftPreferredPage(c *gin.Context) {
 }
 
 // GET /api/shift_preferred/:year/:month
-func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context) 
+func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
 	var params request.GetShiftPreferredParams
@@ -49,7 +49,7 @@ func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context)
 	var res response.GetShiftPreferred
 	utils.MapFields(&res, result)
 	c.JSON(200, res)
-
+}
 
 // POST /api/shift_preferred/:year/:month
 func (ctr *ShiftPreferredController) ApiPost(c *gin.Context) {

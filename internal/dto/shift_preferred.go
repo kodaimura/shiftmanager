@@ -2,7 +2,7 @@ package dto
 
 
 type ShiftPreferred struct {
-	AccountId string `json:"account_id"`
+	AccountId int `json:"account_id"`
 	Year int `json:"year"`
 	Month int `json:"month"`
 	Dates *string `json:"dates"`
@@ -12,13 +12,13 @@ type ShiftPreferred struct {
 }
 
 type ShiftPreferredPK struct {
-	AccountId string `json:"account_id"`
+	AccountId int `json:"account_id"`
 	Year int `json:"year"`
 	Month int `json:"month"`
 }
 
 type SaveShiftPreferred struct {
-	AccountId string `json:"account_id"`
+	AccountId int `json:"account_id"`
 	Year int `json:"year"`
 	Month int `json:"month"`
 	Dates *string `json:"dates"`

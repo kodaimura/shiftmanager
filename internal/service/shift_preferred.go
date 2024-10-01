@@ -51,19 +51,19 @@ func (srv *shiftPreferredService) Save(input dto.SaveShiftPreferred) error {
 	shiftPreferred, err := srv.shiftPreferredRepository.GetOne(&model.ShiftPreferred{ 
 		AccountId: input.AccountId, 
 		Year: input.Year, 
-		Month: input.Month
+		Month: input.Month,
 	})
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			shiftPreferred = &model.ShiftPreferred{
+			shiftPreferred = model.ShiftPreferred{
 				AccountId: input.AccountId,
 				Year: input.Year,
 				Month: input.Month,
 				Dates: input.Dates,
 				Notes: input.Notes,
 			}
-			err = srv.shiftPreferredRepository.Insert(shiftPreferred, nil)
+			err = srv.shiftPreferredRepository.Insert(&shiftPreferred, nil)
 		} else {
 			logger.Error(err.Error())
 			return err
@@ -71,7 +71,7 @@ func (srv *shiftPreferredService) Save(input dto.SaveShiftPreferred) error {
 	} else {
 		shiftPreferred.Dates = input.Dates
 		shiftPreferred.Notes = input.Notes
-		err = srv.shiftPreferredRepository.Update(shiftPreferred, nil)
+		err = srv.shiftPreferredRepository.Update(&shiftPreferred, nil)
 	}
 
 	if err != nil {
