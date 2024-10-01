@@ -1,125 +1,79 @@
-document.addEventListener('DOMContentLoaded', (event) => {
-    /*
-    const year = document.getElementById('year').value
-    const month = document.getElementById('month').value
-    const startDate = new Date(year, month - 1, 1)
-    const lastDate = new Date(year, month, 0)
-    */
-    document.getElementById('calendar').innerHTML = makeCalendar(startDate, lastDate)
-    reflectHolidaysToCalendar(year, month, lastDate.getDate())
-    reflectSelectDaysToCalendar(getSelectDays())
-    addEventToCalendarCell(lastDate.getDate())
-    addInfoToCalendarCell(startDate)
-}) 
+let holidayCache = {};
+let year;
+let month; 
 
+window.addEventListener("DOMContentLoaded", async () => {
+    year = parseInt(document.getElementById('year').value, 10);
+    month = parseInt(document.getElementById('month').value, 10); 
+    await fetchHolidays(year, month);
+    generateCalendar(year, month);
+});
 
-const makeCalendar = (startDate, lastDate) => {
-    const startDayOfWeek = startDate.getDay()
-    const lastDay = lastDate.getDate()
-    let day = 1 
-    let calendar = ''
-    calendar += 
-    `<table class="table"><thead class="table-secondary"><tr><th>日</th><th>月</th><th>火</th><th>水</th>
-    <th>木</th><th>金</th><th>土</th></tr></thead>`
-
-    for (let w = 0; w < 6; w++) {
-        calendar += '<tr>'
-
-        for (let d = 0; d < 7; d++) {
-            if (w == 0 && d < startDayOfWeek || day > lastDay) {
-                calendar += '<td></td>'
-            } else {
-                calendar += `<td id="d${day}">` + day + 
-                `<div id="info${day}" class="cellinfo">0</div></td>`
-                day++
-            }
-        }
-        calendar += '</tr>'
+const fetchHolidays = async (year, month) => {
+    const url = `https://api.national-holidays.jp/${year}${String(month).padStart(2, '0')}`;
+    try {
+        const response = await fetch(url);
+        holidayCache[`${year}-${month}`] = await response.json();
+    } catch (error) {
+        console.error('Error fetching holidays:', error);
     }
-    return calendar + '</table>'
-}
-
+};
 
 const isHoliday = (year, month, day) => {
-    const date = new Date(year, month - 1, day)
-    let bool = false
-    try {
-        bool = JapaneseHolidays.isHoliday(date) !== undefined
-    }finally {
-        return bool
+    if (!holidayCache[`${year}-${month}`]) {
+        console.error(`祝日データがロードされていません: ${year}-${month}`);
+        return false;
     }
-}
+    const targetDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return holidayCache[`${year}-${month}`].some(holiday => holiday.date === targetDate);
+};
 
+const generateCalendar = (year, month) => {
+    const calendarDiv = document.getElementById('calendar');
+    calendarDiv.innerHTML = '';
 
-const reflectHolidaysToCalendar = (year, month, lastDay) => {
-    for (let i = 1; i <= lastDay; i++) {
-        if (isHoliday(year, month, i)) {
-            document.getElementById(`d${i}`).classList.add('holiday')
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+
+    const table = document.createElement('table');
+    table.classList.add('calendar-table');
+
+    const header = document.createElement('tr');
+    ['日', '月', '火', '水', '木', '金', '土'].forEach(day => {
+        const th = document.createElement('th');
+        th.textContent = day;
+        header.appendChild(th);
+    });
+    table.appendChild(header);
+
+    let row = document.createElement('tr');
+    for (let i = 0; i < firstDay.getDay(); i++) {
+        row.appendChild(document.createElement('td'));
+    }
+
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const cell = document.createElement('td');
+        cell.textContent = day;
+
+        const dayOfWeek = new Date(year, month - 1, day).getDay();
+        if (dayOfWeek === 0 || isHoliday(year, month, day)) {
+            cell.classList.add('holiday');
+        } else if (dayOfWeek === 6) {
+            cell.classList.add('saturday');
+        } else {
+            cell.classList.add('weekday');
         }
-    }  
-}
 
-
-const reflectSelectDaysToCalendar = (days) => {
-    let dayCell
-    let classList
-    for (d of days){
-        dayCell = document.getElementById(`d${d}`)
-        classList = (dayCell === null)? null : dayCell.classList
-        if (classList != null && !classList.contains('selected')) {
-            classList.add('selected')
-        }
-    }
-}
-
-
-const getSelectDays = () => {
-    days = document.getElementById('selectdays').value
-    return (days === '')? [] : days.split(',')
-}
-
-
-const setSelectDays = (days) => {
-    document.getElementById('selectdays').value = days.join(',')
-}
-
-
-const addEventToCalendarCell = (lastDay) => {
-    for (let i = 1; i <= lastDay; i++) {
-        document.getElementById(`d${i}`).addEventListener('click', (e) => {
-            let days = getSelectDays()
-            let dayCell = document.getElementById(`d${i}`)
-            let classList = dayCell.classList
-            if (classList.contains('selected')) {
-                classList.remove('selected')
-                days = days.filter(d => d !== dayCell.id.substring(1))
-            }else{
-                classList.add('selected')
-                days.push(dayCell.id.substring(1))
-            }
-            setSelectDays(days)
-        })
-    }
-}
-
-
-const addInfoToCalendarCell = (startDate) => {
-    const year = startDate.getFullYear()
-    const month = startDate.getMonth() + 1
-    fetch(`/api/group/workables/${year}/${month}`)
-    .then(response => response.json())
-    .then(data => reflectInfo(data))
-}
-
-
-const reflectInfo = (data) => {
-    let workabledays
-    let dayCell
-    for (d of data){
-        workabledays = (d.workabledays === '')? [] : d.workabledays.split(',')
-        for (day of workabledays){
-            infoCell = document.getElementById(`info${day}`)
-            infoCell.innerHTML = parseInt(infoCell.innerHTML) + 1
+        row.appendChild(cell);
+        if ((firstDay.getDay() + day) % 7 === 0) {
+            table.appendChild(row);
+            row = document.createElement('tr');
         }
     }
-}
+
+    if (row.children.length > 0) {
+        table.appendChild(row);
+    }
+
+    calendarDiv.appendChild(table);
+};

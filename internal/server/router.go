@@ -14,6 +14,7 @@ func SetWebRouter(r *gin.RouterGroup) {
 	ic := controller.NewIndexController()
 	ac := controller.NewAccountController()
 	apc := controller.NewAccountProfileController()
+	spc := controller.NewShiftPreferredController()
 
 	r.GET("/signup", middleware.BasicAuthMiddleware(), ac.SignupPage)
 	r.GET("/login", ac.LoginPage)
@@ -23,6 +24,7 @@ func SetWebRouter(r *gin.RouterGroup) {
 	{
 		auth.GET("/", ic.IndexPage)
 		auth.GET("/account_profile", apc.AccountProfilePage)
+		auth.GET("/shift_preferred/:year/:month", spc.ShiftPreferredPage)
 	}
 }
 
@@ -33,6 +35,7 @@ func SetWebRouter(r *gin.RouterGroup) {
 func SetApiRouter(r *gin.RouterGroup) {
 	ac := controller.NewAccountController()
 	apc := controller.NewAccountProfileController()
+	spc := controller.NewShiftPreferredController()
 
 	r.POST("/signup", ac.ApiSignup)
 	r.POST("/login", ac.ApiLogin)
@@ -46,5 +49,8 @@ func SetApiRouter(r *gin.RouterGroup) {
 
 		auth.GET("/account_profile", apc.ApiGetOne)
 		auth.POST("/account_profile", apc.ApiPost)
+
+		auth.GET("/shift_preferred/:year/:month", spc.ApiGetOne)
+		auth.POST("/shift_preferred/:year/:month", spc.ApiPost)
 	}
 }

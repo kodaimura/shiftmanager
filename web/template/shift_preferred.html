@@ -7,6 +7,7 @@
     background-color: yellow !important;
 }
 </style>
+<link rel="stylesheet" href="/css/shift_preferred.css">
 <script src="https://cdn.rawgit.com/osamutake/japanese-holidays-js/v1.0.10/lib/japanese-holidays.min.js"></script>
 <body>
 {{template "header" .}}
@@ -14,10 +15,11 @@
 <main class="container">
 <h3>出勤可能日</h3>
 <div class="mb-1">
-	<h4>年月</h4>
-</div>
+	<h4>{{.year}}年{{.month}}月</h4>
+</div> 
+<input type="hidden" id="year" value="{{.year}}">
+<input type="hidden" id="month" value="{{.month}}">
 <div id="calendar"></div>
-※グレー数字 ... 自分含めた提出人数
 
 <div class="my-3">
 <form method="POST" action="/workable/{{.year}}/{{.month}}">
@@ -31,7 +33,6 @@
 </main>
 
 {{template "footer"}}
-<link rel="stylesheet" href="/css/calendar.css">
-<script type="module" src="/js/calendar.js"></script>
+<script type="module" src="/js/shift_preferred.js"></script>
 </body>
 </html>

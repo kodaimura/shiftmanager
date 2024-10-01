@@ -21,9 +21,12 @@ func NewShiftPreferredController() *ShiftPreferredController {
 	}
 }
 
-// GET /shift_preferred
+// GET /shift_preferred/:year/:month
 func (ctr *ShiftPreferredController) ShiftPreferredPage(c *gin.Context) {
-	c.HTML(200, "shift_preferred.html", gin.H{})
+	c.HTML(200, "shift_preferred.html", gin.H{
+		"year": c.Param("year"),
+		"month": c.Param("month"),
+	})
 }
 
 // GET /api/shift_preferred/:year/:month
