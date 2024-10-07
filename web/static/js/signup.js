@@ -1,11 +1,11 @@
-import { getErrorStatus, handleResponse, handleError } from '/js/script.js';
+import { api } from '/js/api.js';
 
 window.addEventListener("DOMContentLoaded", function() {
     document.getElementById("signup").addEventListener("click", signup);
 });
 
 
-const signup = () => {
+const signup = async () => {
     const form = document.getElementById("signup-form");
     if (!validate(form)) return;
 
@@ -17,22 +17,14 @@ const signup = () => {
         account_password: account_password
     };
 
-    fetch('/api/signup', {
-        method: 'POST',
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(body)
-    })
-    .then(handleResponse)
-    .then(() => {
+    try {
+        await api.post('signup', body);
         window.location.replace('/login');
-    })
-    .catch(handleError)
-    .catch((error) => {
-        const status = getErrorStatus(error);
-        document.getElementById("error").innerHTML = (status === 409)
+    } catch (e) {
+        document.getElementById("error").innerHTML = (e.status === 409)
         ? "ユーザ名が既に使われています。"
         : "登録に失敗しました。";
-    });
+    }
 }
 
 const validate = (form) => {

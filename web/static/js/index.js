@@ -1,4 +1,4 @@
-import { getErrorStatus, handleResponse, handleError } from '/js/script.js';
+import { api } from '/js/api.js';
 
 window.addEventListener("DOMContentLoaded", function() {
     getProfile();
@@ -6,17 +6,15 @@ window.addEventListener("DOMContentLoaded", function() {
     document.getElementById("shift-preferred").addEventListener("click", confirmProfileRegistered);
 });
 
-const getProfile = () => {
-    fetch('/api/account_profile', {
-        method: 'GET',
-        headers: {"Content-Type": "application/json"},
-    })
-    .then(handleResponse)
-    .then((data) => {
-        document.getElementById('display_name').textContent = data.display_name;
-        document.getElementById('account_role').textContent = data.account_role;
-    })
-    .catch(handleError)
+const getProfile = async () => {
+    try {
+        const result = await api.get('account_profile');
+        const form = document.getElementById("profile-form");
+        document.getElementById('display_name').textContent = result.display_name;
+        document.getElementById('account_role').textContent = result.account_role;
+    } catch (e) {
+        console.error(e)
+    }
 }
 
 const confirmProfileRegistered = (event) => {
