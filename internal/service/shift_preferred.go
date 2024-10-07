@@ -35,10 +35,11 @@ func (srv *shiftPreferredService) GetOne(input dto.ShiftPreferredPK) (dto.ShiftP
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
+			return dto.ShiftPreferred{}, nil
 		} else {
 			logger.Error(err.Error())
+			return dto.ShiftPreferred{}, err
 		}
-		return dto.ShiftPreferred{}, err
 	}
 
 	var ret dto.ShiftPreferred
