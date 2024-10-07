@@ -81,5 +81,18 @@ class Api {
 }
 
 const api = new Api(BASE_URL);
+api.handleHttpError = (error) => {
+    const status = error.status;
+    if (status === 401) {
+        if (window.location.pathname !== '/login') {
+            window.location.replace('/login');
+        }
+    } else if (status === 403) {
+        alert("権限がありません。");
+    } else if (status === 500) {
+        alert("予期せぬエラーが発生しました。");
+    }
+    throw error;
+}
 
 export { HttpError, Api, BASE_URL, api };
