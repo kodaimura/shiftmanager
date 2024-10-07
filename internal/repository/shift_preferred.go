@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"database/sql"
 
 	"shiftmanager/internal/core/db"
@@ -82,8 +81,6 @@ func (rep *shiftPreferredRepository) GetOne(sp *model.ShiftPreferred) (model.Shi
 		,created_at
 		,updated_at
 	 FROM shift_preferred ` + where
-
-	fmt.Println(query)
 
 	err := rep.db.QueryRow(query, binds...).Scan(
 		&ret.AccountId,

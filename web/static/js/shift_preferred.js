@@ -7,9 +7,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     const year = parseInt(document.getElementById('year').value);
     const month = parseInt(document.getElementById('month').value); 
     await fetchHolidays(year, month);
-    generateCalendar(year, month);
-    const data = await getShiftPreferred(year, month);
+    const shiftPreferred = await getShiftPreferred(year, month);
+    const dates = shiftPreferred.dates;
+    const form = document.getElementById('shift-preferred-form');
+    form.elements['dates'].value = dates;
+    selectedDays = dates.split(',');
 
+    generateCalendar(year, month);
     document.getElementById("save").addEventListener("click", save);
 });
 
@@ -68,6 +72,10 @@ const generateCalendar = (year, month) => {
             cell.classList.add('weekday');
         }
 
+        if (selectedDays.includes(String(day))) {
+            cell.style.backgroundColor = 'yellow';
+        }
+
         cell.addEventListener('click', () => handleDateClick(cell, day));
 
         row.appendChild(cell);
@@ -99,10 +107,7 @@ const handleDateClick = (cell, day) => {
 
 const getShiftPreferred = async (year, month) => {
     try {
-        const result = await api.get(`shift_preferred/${year}/${month}`);
-        const form = document.getElementById('shift-preferred-form');
-        form.elements['dates'].value = result.dates;
-        selectedDays = result.dates.split(',')
+        return await api.get(`shift_preferred/${year}/${month}`);
     } catch (e) {
         console.error(e);
     }
@@ -117,8 +122,7 @@ const save = async () => {
         notes: '',
     };
     try {
-        const result = await api.post(`shift_preferred/${year}/${month}`, body);
-        console.log(result);
+       await api.post(`shift_preferred/${year}/${month}`, body);
     } catch (e) {
         console.error(e);
     }
