@@ -107,16 +107,12 @@ func IsZero(value interface{}) bool {
 	if value == nil {
         return true
     }
-    switch v := value.(type) {
-    case string:
-        return v == ""
-    case int:
-        return v == 0
-    case float32:
-        return v == 0.0
-    case float64:
-        return v == 0.0
-    default:
-        return false
-    }
+    v := reflect.ValueOf(value)
+	if v.Kind() == reflect.Ptr {
+		if v.IsNil() {
+			return true
+		}
+		v = v.Elem()
+	}
+	return v.IsZero()
 }
