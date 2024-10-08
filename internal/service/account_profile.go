@@ -30,10 +30,11 @@ func (srv *accountProfileService) GetOne(accountId int) (dto.AccountProfile, err
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Debug(err.Error())
+			return dto.AccountProfile{}, nil
 		} else {
 			logger.Error(err.Error())
+			return dto.AccountProfile{}, err
 		}
-		return dto.AccountProfile{}, err
 	}
 
 	var ret dto.AccountProfile

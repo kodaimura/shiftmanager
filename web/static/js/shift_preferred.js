@@ -9,9 +9,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     await fetchHolidays(year, month);
     const shiftPreferred = await getShiftPreferred(year, month);
     const dates = shiftPreferred.dates;
-    const form = document.getElementById('shift-preferred-form');
-    form.elements['dates'].value = dates;
-    selectedDays = dates.split(',');
+    if (dates) {
+        const form = document.getElementById('shift-preferred-form');
+        form.elements['dates'].value = dates;
+        selectedDays = dates.split(',');
+    }
 
     generateCalendar(year, month);
     document.getElementById("save").addEventListener("click", save);
