@@ -9,7 +9,6 @@ import (
 	"shiftmanager/internal/service"
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/request"
-	"shiftmanager/internal/response"
 )
 
 type AccountController struct {
@@ -49,7 +48,7 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 	var input dto.Signup
 	utils.MapFields(&input, req)
 
-	pk, err := ctr.accountService.Signup(input)
+	result, err := ctr.accountService.Signup(input)
 	if err != nil {
 		if _, ok := err.(errs.UniqueConstraintError); ok {
 			JsonError(c, 409, "ユーザ名が既に使われています。")
@@ -59,9 +58,7 @@ func (ctr *AccountController) ApiSignup(c *gin.Context) {
 		return
 	}
 
-	var res response.AccountPK
-	utils.MapFields(&res, pk)
-	c.JSON(200, res)
+	c.JSON(200, result)
 }
 
 // POST /api/login
@@ -94,17 +91,14 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 // GET /api/account
 func (ctr *AccountController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	account, err := ctr.accountService.GetOne(dto.AccountPK{Id: pl.AccountId})
+	result, err := ctr.accountService.GetOne(dto.AccountPK{Id: pl.AccountId})
 
 	if err != nil {
 		JsonError(c, 500, "アカウント情報の取得に失敗しました。")
 		return
 	}
 
-	var res response.GetAccount
-	utils.MapFields(&res, account)
-
-	c.JSON(200, res)
+	c.JSON(200, result)
 }
 
 // PUT /api/account/password

@@ -8,7 +8,6 @@ import (
 	"shiftmanager/internal/service"
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/request"
-	"shiftmanager/internal/response"
 )
 
 type ShiftPreferredController struct {
@@ -49,9 +48,7 @@ func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context) {
 		return
 	}
 
-	var res response.GetShiftPreferred
-	utils.MapFields(&res, result)
-	c.JSON(200, res)
+	c.JSON(200, result)
 }
 
 // POST /api/shift_preferred/:year/:month

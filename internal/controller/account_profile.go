@@ -8,7 +8,6 @@ import (
 	"shiftmanager/internal/service"
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/request"
-	"shiftmanager/internal/response"
 )
 
 type AccountProfileController struct {
@@ -29,16 +28,14 @@ func (ctr *AccountProfileController) AccountProfilePage(c *gin.Context) {
 // GET /api/account_profile
 func (ctr *AccountProfileController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
-	profile, err := ctr.accountProfileService.GetOne(pl.AccountId)
+	result, err := ctr.accountProfileService.GetOne(pl.AccountId)
 
 	if err != nil {
 		JsonError(c, 500, "プロフィール情報の取得に失敗しました。")
 		return
 	}
 
-	var res response.GetAccountProfile
-	utils.MapFields(&res, profile)
-	c.JSON(200, res)
+	c.JSON(200, result)
 }
 
 // POST /api/account_profile
