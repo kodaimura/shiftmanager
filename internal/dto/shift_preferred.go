@@ -24,3 +24,8 @@ type SaveShiftPreferred struct {
 	Dates *string `json:"dates"`
 	Notes *string `json:"notes"`
 }
+
+type GetShiftPreferred struct {
+	Year int `json:"year"`
+	Month int `json:"month"`
+}

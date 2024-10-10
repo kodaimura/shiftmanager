@@ -32,7 +32,7 @@ func (ctr *ShiftPreferredController) ShiftPreferredPage(c *gin.Context) {
 func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
-	var params request.GetShiftPreferredParams
+	var params request.ShiftPreferredUri
     if err := c.ShouldBindUri(&params); err != nil {
         JsonError(c, 400, "不正なリクエストです。")
         return
@@ -55,7 +55,7 @@ func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context) {
 func (ctr *ShiftPreferredController) ApiPost(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
-	var params request.PostShiftPreferredParams
+	var params request.ShiftPreferredUri
     if err := c.ShouldBindUri(&params); err != nil {
         JsonError(c, 400, "不正なリクエストです。")
         return
@@ -77,4 +77,25 @@ func (ctr *ShiftPreferredController) ApiPost(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{})
+}
+
+
+// GET /api/shift_preferred?year=:year&month=:month
+func (ctr *ShiftPreferredController) ApiGet(c *gin.Context) {
+	var params request.ShiftPreferredQuery
+    if err := c.ShouldBindQuery(&params); err != nil {
+        JsonError(c, 400, "不正なリクエストです。")
+        return
+	}
+
+	var input dto.GetShiftPreferred
+	utils.MapFields(&input, params)
+
+	result, err := ctr.shiftPreferredService.Get(input)
+	if err != nil {
+		JsonError(c, 500, "シフト希望の取得に失敗しました。")
+		return
+	}
+
+	c.JSON(200, result)
 }

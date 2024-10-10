@@ -12,6 +12,7 @@ import (
 
 type ShiftPreferredService interface {
 	GetOne(input dto.ShiftPreferredPK) (dto.ShiftPreferred, error)
+	Get(input dto.GetShiftPreferred) ([]dto.ShiftPreferred, error)
 	Save(input dto.SaveShiftPreferred) error
 }
 
@@ -43,6 +44,23 @@ func (srv *shiftPreferredService) GetOne(input dto.ShiftPreferredPK) (dto.ShiftP
 	}
 
 	var ret dto.ShiftPreferred
+	utils.MapFields(&ret, shiftPreferred)
+	return ret, nil
+}
+
+
+func (srv *shiftPreferredService) Get(input dto.GetShiftPreferred) ([]dto.ShiftPreferred, error) {
+	shiftPreferred, err := srv.shiftPreferredRepository.Get(&model.ShiftPreferred{
+		Year: input.Year,
+		Month: input.Month,
+	})
+
+	if err != nil {
+		logger.Error(err.Error())
+		return []dto.ShiftPreferred{}, err
+	}
+
+	var ret []dto.ShiftPreferred
 	utils.MapFields(&ret, shiftPreferred)
 	return ret, nil
 }

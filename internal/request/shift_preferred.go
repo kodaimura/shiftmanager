@@ -6,12 +6,12 @@ type PostShiftPreferred struct {
 	Notes *string `json:"notes"`
 }
 
-type GetShiftPreferredParams struct {
+type ShiftPreferredUri struct {
     Year  int `uri:"year" binding:"required"`
     Month int `uri:"month" binding:"required"`
 }
 
-type PostShiftPreferredParams struct {
-    Year  int `uri:"year" binding:"required"`
-    Month int `uri:"month" binding:"required"`
+type ShiftPreferredQuery struct {
+    Year  int `form:"year" binding:"required"`
+    Month int `form:"month" binding:"required"`
 }

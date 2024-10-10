@@ -86,15 +86,35 @@ func MapFields(dst, src interface{}) error {
     srcVal := reflect.ValueOf(src)
     dstVal := reflect.ValueOf(dst).Elem()
 
+    if srcVal.Kind() == reflect.Slice || srcVal.Kind() == reflect.Array {
+        if dstVal.Kind() != reflect.Slice && dstVal.Kind() != reflect.Array {
+            return fmt.Errorf("dst must be a slice or array if src is a slice or array")
+        }
+
+        newSlice := reflect.MakeSlice(dstVal.Type(), srcVal.Len(), srcVal.Len())
+        for i := 0; i < srcVal.Len(); i++ {
+            srcElem := srcVal.Index(i).Interface()
+            dstElem := reflect.New(newSlice.Index(i).Type()).Interface()
+
+            if err := MapFields(dstElem, srcElem); err != nil {
+                return err
+            }
+            newSlice.Index(i).Set(reflect.ValueOf(dstElem).Elem())
+        }
+
+        dstVal.Set(newSlice)
+        return nil
+    }
+
     if srcVal.Kind() != reflect.Struct || dstVal.Kind() != reflect.Struct {
-        return fmt.Errorf("src and dst must be structs")
+        return fmt.Errorf("src and dst must be structs or arrays/slices of structs")
     }
 
     for i := 0; i < srcVal.NumField(); i++ {
         srcField := srcVal.Type().Field(i)
         dstField := dstVal.FieldByName(srcField.Name)
 
-        if dstField.IsValid() && dstField.Type() == srcVal.Field(i).Type() {
+        if dstField.IsValid() && dstField.CanSet() && dstField.Type() == srcVal.Field(i).Type() {
             dstField.Set(srcVal.Field(i))
         }
     }

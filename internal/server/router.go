@@ -50,6 +50,7 @@ func SetApiRouter(r *gin.RouterGroup) {
 		auth.GET("/account_profile", apc.ApiGetOne)
 		auth.POST("/account_profile", apc.ApiPost)
 
+		auth.GET("/shift_preferred", spc.ApiGet)
 		auth.GET("/shift_preferred/:year/:month", spc.ApiGetOne)
 		auth.POST("/shift_preferred/:year/:month", spc.ApiPost)
 	}
