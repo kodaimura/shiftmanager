@@ -20,7 +20,7 @@ func NewShiftPreferredController() *ShiftPreferredController {
 	}
 }
 
-// GET /shift_preferred/:year/:month
+// GET /shift_preferreds/me/:year/:month
 func (ctr *ShiftPreferredController) ShiftPreferredPage(c *gin.Context) {
 	c.HTML(200, "shift_preferred.html", gin.H{
 		"year": c.Param("year"),
@@ -28,7 +28,7 @@ func (ctr *ShiftPreferredController) ShiftPreferredPage(c *gin.Context) {
 	})
 }
 
-// GET /api/shift_preferred/:year/:month
+// GET /api/shift_preferreds/me/:year/:month
 func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
@@ -51,7 +51,7 @@ func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context) {
 	c.JSON(200, result)
 }
 
-// POST /api/shift_preferred/:year/:month
+// POST /api/shift_preferreds/me/:year/:month
 func (ctr *ShiftPreferredController) ApiPost(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
@@ -80,7 +80,7 @@ func (ctr *ShiftPreferredController) ApiPost(c *gin.Context) {
 }
 
 
-// GET /api/shift_preferred?year=:year&month=:month
+// GET /api/shift_preferreds?year=:year&month=:month
 func (ctr *ShiftPreferredController) ApiGet(c *gin.Context) {
 	var params request.ShiftPreferredQuery
     if err := c.ShouldBindQuery(&params); err != nil {

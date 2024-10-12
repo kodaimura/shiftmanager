@@ -20,12 +20,12 @@ func NewAccountProfileController() *AccountProfileController {
 	}
 }
 
-// GET /account_profile
+// GET /account_profiles/me
 func (ctr *AccountProfileController) AccountProfilePage(c *gin.Context) {
 	c.HTML(200, "account_profile.html", gin.H{})
 }
 
-// GET /api/account_profile
+// GET /api/account_profiles/me
 func (ctr *AccountProfileController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 	result, err := ctr.accountProfileService.GetOne(pl.AccountId)
@@ -38,7 +38,7 @@ func (ctr *AccountProfileController) ApiGetOne(c *gin.Context) {
 	c.JSON(200, result)
 }
 
-// POST /api/account_profile
+// POST /api/account_profiles/me
 func (ctr *AccountProfileController) ApiPost(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 

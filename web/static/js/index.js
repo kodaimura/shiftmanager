@@ -46,7 +46,7 @@ const isHoliday = (year, month, day) => {
 
 const getProfile = async () => {
     try {
-        const result = await api.get('account_profile');
+        const result = await api.get('account_profiles/me');
         document.getElementById('display_name').textContent = result.display_name;
         document.getElementById('account_role').textContent = result.account_role;
     } catch (e) {
@@ -106,7 +106,7 @@ const getShiftPreferred = async () => {
     const year = targetDate.getFullYear();
     const month = targetDate.getMonth() + 1;
     try {
-        const result = await api.get(`shift_preferred?year=${year}&month=${month}`);
+        const result = await api.get(`shift_preferreds?year=${year}&month=${month}`);
         for (let data of result) {
             const accountId = data.account_id;
             const dates = data.dates.split(',').map(Number);
@@ -137,7 +137,7 @@ const renderLinks = () => {
     const year = targetDate.getFullYear();
     const month = targetDate.getMonth() + 1;
 
-    document.getElementById('shift-preferred').href = `/shift_preferred/${year}/${month}`
+    document.getElementById('shift-preferred').href = `/shift_preferreds/me/${year}/${month}`
     document.getElementById('shift-generate').href = `/shift/${year}/${month}/generate`
     document.getElementById('shift-edit').href = `/shift/${year}/${month}/edit`
 };

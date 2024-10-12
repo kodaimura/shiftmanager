@@ -107,7 +107,7 @@ const handleClickCell = (cell, day) => {
 
 const getShiftPreferred = async (year, month) => {
     try {
-        const response = await api.get(`shift_preferred/${year}/${month}`);
+        const response = await api.get(`shift_preferreds/me/${year}/${month}`);
         const dates = response.dates;
         if (dates) {
             const form = document.getElementById('shift-preferred-form');
@@ -127,7 +127,7 @@ const save = async () => {
         notes: '',
     };
     try {
-       await api.post(`shift_preferred/${year}/${month}`, body);
+       await api.post(`shift_preferreds/me/${year}/${month}`, body);
     } catch (e) {
         console.error(e);
     }

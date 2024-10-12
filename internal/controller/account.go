@@ -88,7 +88,7 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
-// GET /api/account
+// GET /api/accounts/me
 func (ctr *AccountController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 	result, err := ctr.accountService.GetOne(dto.AccountPK{Id: pl.AccountId})
@@ -101,7 +101,7 @@ func (ctr *AccountController) ApiGetOne(c *gin.Context) {
 	c.JSON(200, result)
 }
 
-// PUT /api/account/password
+// PUT /api/accounts/me/password
 func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
@@ -129,7 +129,7 @@ func (ctr *AccountController) ApiPutPassword(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
-// PUT /api/account/name
+// PUT /api/accounts/me/name
 func (ctr *AccountController) ApiPutName(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
@@ -155,7 +155,7 @@ func (ctr *AccountController) ApiPutName(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
-// DELETE /api/account
+// DELETE /api/accounts/me
 func (ctr *AccountController) ApiDelete(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 

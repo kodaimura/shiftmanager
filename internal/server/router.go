@@ -23,8 +23,8 @@ func SetWebRouter(r *gin.RouterGroup) {
 	auth := r.Group("", middleware.JwtAuthMiddleware())
 	{
 		auth.GET("/", ic.IndexPage)
-		auth.GET("/account_profile", apc.AccountProfilePage)
-		auth.GET("/shift_preferred/:year/:month", spc.ShiftPreferredPage)
+		auth.GET("/account_profiles/me", apc.AccountProfilePage)
+		auth.GET("/shift_preferreds/me/:year/:month", spc.ShiftPreferredPage)
 	}
 }
 
@@ -42,16 +42,16 @@ func SetApiRouter(r *gin.RouterGroup) {
 
 	auth := r.Group("", middleware.JwtAuthApiMiddleware())
 	{
-		auth.GET("/account", ac.ApiGetOne)
-		auth.PUT("/account/name", ac.ApiPutName)
-		auth.PUT("/account/password", ac.ApiPutPassword)
-		auth.DELETE("/account", ac.ApiDelete)
+		auth.GET("/accounts/me", ac.ApiGetOne)
+		auth.PUT("/accounts/me/name", ac.ApiPutName)
+		auth.PUT("/accounts/me/password", ac.ApiPutPassword)
+		auth.DELETE("/accounts/me", ac.ApiDelete)
 
-		auth.GET("/account_profile", apc.ApiGetOne)
-		auth.POST("/account_profile", apc.ApiPost)
+		auth.GET("/account_profiles/me", apc.ApiGetOne)
+		auth.POST("/account_profiles/me", apc.ApiPost)
 
-		auth.GET("/shift_preferred", spc.ApiGet)
-		auth.GET("/shift_preferred/:year/:month", spc.ApiGetOne)
-		auth.POST("/shift_preferred/:year/:month", spc.ApiPost)
+		auth.GET("/shift_preferreds", spc.ApiGet)
+		auth.GET("/shift_preferreds/me/:year/:month", spc.ApiGetOne)
+		auth.POST("/shift_preferreds/me/:year/:month", spc.ApiPost)
 	}
 }
