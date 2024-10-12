@@ -1,5 +1,4 @@
 import { api } from '/js/api.js';
-import { getJaTime } from '/js/script.js';
 
 let holidayCache = {};
 
@@ -11,6 +10,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     
 
     renderCalendar(year, month);
+    highlightSelectedDays();
     document.getElementById("save").addEventListener("click", save);
 });
 
@@ -38,8 +38,6 @@ const isHoliday = (year, month, day) => {
 };
 
 const renderCalendar = (year, month) => {
-    const form = document.getElementById('shift-preferred-form');
-    const selectedDays = form.elements['dates'].value.split(',');
     const calendarBody = document.querySelector('#calendar tbody');
     calendarBody.innerHTML = '';
 
@@ -64,11 +62,8 @@ const renderCalendar = (year, month) => {
             cell.classList.add('weekday');
         }
 
-        if (selectedDays.includes(String(day))) {
-            cell.style.backgroundColor = 'yellow';
-        }
-
-        cell.addEventListener('click', () => handleDateClick(cell, day));
+        cell.dataset.day = day;
+        cell.addEventListener('click', () => handleClickCell(cell, day));
 
         row.appendChild(cell);
         if ((firstDay.getDay() + day) % 7 === 0) {
@@ -82,7 +77,22 @@ const renderCalendar = (year, month) => {
     }
 };
 
-const handleDateClick = (cell, day) => {
+const highlightSelectedDays = () => {
+    const form = document.getElementById('shift-preferred-form');
+    const selectedDays = form.elements['dates'].value.split(',');
+
+    const cells = document.querySelectorAll('#calendar tbody td');
+    cells.forEach(cell => {
+        const day = cell.dataset.day;
+        if (selectedDays.includes(day)) {
+            cell.style.backgroundColor = 'yellow';
+        } else {
+            cell.style.backgroundColor = '';
+        }
+    });
+};
+
+const handleClickCell = (cell, day) => {
     const form = document.getElementById('shift-preferred-form');
     let selectedDays = form.elements['dates'].value.split(',');
     if (!selectedDays.includes(day)) {
