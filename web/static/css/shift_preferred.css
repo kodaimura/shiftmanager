@@ -1,44 +1,43 @@
-  #calendar {
+#calendar {
     margin: auto;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
-  }
-  
-  table.calendar-table {
+}
+
+#calendar table {
     width: 100%;
     border-collapse: collapse;
     text-align: center;
     color: #333;
-  }
+}
 
-  table.calendar-table th {
+#calendar table th {
     background-color: #555;
     color: white;
     padding: 10px;
     font-weight: bold;
-  }
-  
-  table.calendar-table td {
+}
+
+#calendar table td {
     padding: 15px;
     border: 1px solid #ddd;
     transition: background-color 0.3s;
-  }
-  
-  table.calendar-table td.weekday {
+}
+
+#calendar table td.weekday {
     color: black;
-  }
-  
-  table.calendar-table td.saturday {
+}
+
+#calendar table td.saturday {
     color: blue;
-  }
-  
-  table.calendar-table td.holiday {
+}
+
+#calendar table td.holiday {
     color: red;
-  }
-  
-  table.calendar-table tr:nth-child(odd) td {
+}
+
+#calendar table tr:nth-child(odd) td {
     background-color: #f9f9f9;
-  }
-  
+}

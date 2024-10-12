@@ -1,29 +1,27 @@
 import { api } from '/js/api.js';
+import { getJaTime } from '/js/script.js';
 
 let holidayCache = {};
-let selectedDays = [];
 
 window.addEventListener("DOMContentLoaded", async () => {
     const year = parseInt(document.getElementById('year').value);
     const month = parseInt(document.getElementById('month').value); 
     await fetchHolidays(year, month);
-    const shiftPreferred = await getShiftPreferred(year, month);
-    const dates = shiftPreferred.dates;
-    if (dates) {
-        const form = document.getElementById('shift-preferred-form');
-        form.elements['dates'].value = dates;
-        selectedDays = dates.split(',');
-    }
+    await getShiftPreferred(year, month);
+    
 
-    generateCalendar(year, month);
+    renderCalendar(year, month);
     document.getElementById("save").addEventListener("click", save);
 });
 
 const fetchHolidays = async (year, month) => {
-    const url = `https://api.national-holidays.jp/${year}${month}`;
+    const url = `https://api.national-holidays.jp/${year}${String(month).padStart(2, '0')}`;
     try {
+        holidayCache[`${year}-${month}`] = [];
         const response = await fetch(url);
-        holidayCache[`${year}-${month}`] = await response.json();
+        if (response.ok) {
+            holidayCache[`${year}-${month}`] = await response.json();
+        }
     } catch (error) {
         console.error('Error fetching holidays:', error);
     }
@@ -34,27 +32,19 @@ const isHoliday = (year, month, day) => {
         console.error(`祝日データがロードされていません: ${year}-${month}`);
         return false;
     }
-    const targetDate = `${year}-${month}-${day}`;
-    return holidayCache[`${year}-${month}`].some(holiday => holiday.date === targetDate);
+    return holidayCache[`${year}-${month}`].some((holiday) => {
+        return holiday.date === `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    });
 };
 
-const generateCalendar = (year, month) => {
-    const calendarDiv = document.getElementById('calendar');
-    calendarDiv.innerHTML = '';
+const renderCalendar = (year, month) => {
+    const form = document.getElementById('shift-preferred-form');
+    const selectedDays = form.elements['dates'].value.split(',');
+    const calendarBody = document.querySelector('#calendar tbody');
+    calendarBody.innerHTML = '';
 
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month, 0);
-
-    const table = document.createElement('table');
-    table.classList.add('calendar-table');
-
-    const header = document.createElement('tr');
-    ['日', '月', '火', '水', '木', '金', '土'].forEach(day => {
-        const th = document.createElement('th');
-        th.textContent = day;
-        header.appendChild(th);
-    });
-    table.appendChild(header);
 
     let row = document.createElement('tr');
     for (let i = 0; i < firstDay.getDay(); i++) {
@@ -82,19 +72,19 @@ const generateCalendar = (year, month) => {
 
         row.appendChild(cell);
         if ((firstDay.getDay() + day) % 7 === 0) {
-            table.appendChild(row);
+            calendarBody.appendChild(row);
             row = document.createElement('tr');
         }
     }
 
     if (row.children.length > 0) {
-        table.appendChild(row);
+        calendarBody.appendChild(row);
     }
-
-    calendarDiv.appendChild(table);
 };
 
 const handleDateClick = (cell, day) => {
+    const form = document.getElementById('shift-preferred-form');
+    let selectedDays = form.elements['dates'].value.split(',');
     if (!selectedDays.includes(day)) {
         selectedDays.push(day);
         cell.style.backgroundColor = 'yellow';
@@ -102,14 +92,17 @@ const handleDateClick = (cell, day) => {
         selectedDays = selectedDays.filter(d => d !== day);
         cell.style.backgroundColor = '';
     }
-
-    const form = document.getElementById('shift-preferred-form');
     form.elements['dates'].value = selectedDays.join(',');
 };
 
 const getShiftPreferred = async (year, month) => {
     try {
-        return await api.get(`shift_preferred/${year}/${month}`);
+        const response = await api.get(`shift_preferred/${year}/${month}`);
+        const dates = response.dates;
+        if (dates) {
+            const form = document.getElementById('shift-preferred-form');
+            form.elements['dates'].value = dates;
+        }
     } catch (e) {
         console.error(e);
     }
