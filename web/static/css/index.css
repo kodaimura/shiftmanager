@@ -21,21 +21,33 @@
 }
 
 #calendar table td {
-    padding: 15px;
     border: 1px solid #ddd;
     transition: background-color 0.3s;
 }
 
-#calendar table td.weekday {
+#calendar table td .weekday {
     color: black;
 }
 
-#calendar table td.saturday {
+#calendar table td .saturday {
     color: blue;
 }
 
-#calendar table td.holiday {
+#calendar table td .holiday {
     color: red;
+}
+
+#calendar table td .day {
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+#calendar table td .names {
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    font-size: 0.85rem;
+    min-height: 3rem;
 }
 
 #calendar table tr:nth-child(odd) td {

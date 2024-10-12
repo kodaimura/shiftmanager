@@ -70,19 +70,25 @@ const renderCalendar = async () => {
     }
 
     for (let day = 1; day <= lastDay.getDate(); day++) {
-        const cell = document.createElement('td');
-        cell.textContent = day;
+        const div1 = document.createElement('div');
+        const div2= document.createElement('div');
+        div1.classList.add('day');
+        div2.classList.add('names');
 
         const dayOfWeek = new Date(year, month - 1, day).getDay();
         if (dayOfWeek === 0 || isHoliday(year, month, day)) {
-            cell.classList.add('holiday');
+            div1.classList.add('holiday');
         } else if (dayOfWeek === 6) {
-            cell.classList.add('saturday');
+            div1.classList.add('saturday');
         } else {
-            cell.classList.add('weekday');
+            div1.classList.add('weekday');
         }
+        div1.textContent = day;
+        div2.dataset.day = day;
 
-        cell.dataset.day = day;
+        const cell = document.createElement('td');
+        cell.appendChild(div1);
+        cell.appendChild(div2);
 
         row.appendChild(cell);
         if ((firstDay.getDay() + day) % 7 === 0) {
@@ -105,18 +111,15 @@ const getShiftPreferred = async () => {
             const accountId = data.account_id;
             const dates = data.dates.split(',').map(Number);
             for (let date of dates) {
-                const cell = document.querySelector(`td[data-day='${date}']`);
+                const cell = document.querySelector(`div[data-day='${date}']`);
                 if (cell) {
                     if (!cell.classList.contains('highlight')) {
                         cell.classList.add('highlight');
                     }
-                    cell.innerHTML += `&nbsp;${accountId}&nbsp;`;
+                    cell.innerHTML += `${accountId}&nbsp;`;
                 }
             };
         }
-        result.forEach(date => {
-            
-        });
     } catch (e) {
         console.error(e);
     }
