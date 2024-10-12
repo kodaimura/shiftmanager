@@ -3,98 +3,71 @@
 <head>
 {{template "head" .}}
 <link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
 {{template "header" .}}
 
 <main class="container">
-    <h2>{{.account_name}}</h2>
-    <div class="table-responsive">
-        <table class="table">
-            <thead class="table-active">
-                <tr>
-                    <th>表示名</th>
-                    <th>役割</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="display_name"></td>
-                    <td id="account_role"></td>
-                    <td><a href="/account_profile">プロフ登録</a></td>
-                </tr>
-            </tbody>
-        </table>
+<h2>{{.account_name}}</h2>
+<div class="table-responsive">
+    <table class="table">
+        <thead class="table-active">
+            <tr>
+                <th>表示名</th>
+                <th>役割</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="display_name"></td>
+                <td id="account_role"></td>
+                <td><a href="/account_profile">プロフ登録</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="d-flex align-items-center justify-content-center my-1">
+    <button class="btn btn-outline-dark me-3 fs-3" id="prev-month">
+        <i class="bi bi-arrow-left"></i>
+    </button>
+    <div class="border border-secondary rounded p-2 text-center fw-bold fs-3">
+        <span id="year"></span>年<span id="month"></span>月
     </div>
-    <div class="d-flex align-items-center justify-content-center my-1">
-        <button class="btn btn-outline-dark me-3 fs-3" id="prev-month">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-        <div class="border border-secondary rounded p-2 text-center fw-bold fs-3">
-            <span id="year"></span>年<span id="month"></span>月
-        </div>
-        <button class="btn btn-outline-dark ms-3 fs-3" id="next-month">
-            <i class="bi bi-arrow-right"></i>
-        </button>
-    </div>
-    <div>
-        <a id="shift-preferred" class="mb-1 btn btn-secondary">シフト希望日登録</a>
-    </div>
+    <button class="btn btn-outline-dark ms-3 fs-3" id="next-month">
+        <i class="bi bi-arrow-right"></i>
+    </button>
+</div>
+<div>
+    <a id="shift-preferred" class="mb-1 btn btn-secondary">シフト希望日登録</a>
+</div>
 
-    <div>
-        <a id="shift-generate" class="mb-1 btn btn-secondary">シフト作成</a>
-    </div>
-    <div>
-        <a id="shift-edit" class="mb-1 btn btn-secondary">シフト編集</a>
-    </div>
+<div id="calendar">
+    <table>
+        <thead>
+            <tr>
+                <th>日</th>
+                <th>月</th>
+                <th>火</th>
+                <th>水</th>
+                <th>木</th>
+                <th>金</th>
+                <th>土</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<div>
+    <a id="shift-generate" class="mb-1 btn btn-secondary">シフト作成</a>
+</div>
+<div>
+    <a id="shift-edit" class="mb-1 btn btn-secondary">シフト編集</a>
+</div>
 </main>
 
 {{template "footer" .}}
-<script>
-    const yearDisplay = document.getElementById('year');
-    const monthDisplay = document.getElementById('month');
-    const prevButton = document.getElementById('prev-month');
-    const nextButton = document.getElementById('next-month');
-
-    const getJaTime = () => {
-        const date = new Date();
-        const utcOffset = date.getTimezoneOffset() * 60000;
-        const jaTime = new Date(date.getTime() + utcOffset + 9 * 3600000);
-        return jaTime;
-     };
-
-    let displayedDate = new Date(getJaTime().getFullYear(), getJaTime().getMonth() + 1);
-
-     const renderMonth = () => {
-         yearDisplay.textContent = displayedDate.getFullYear();
-         monthDisplay.textContent = displayedDate.getMonth() + 1
-     };
-
-    const updateLinks = () => {
-        const year = displayedDate.getFullYear();
-        const month = displayedDate.getMonth() + 1
-        document.getElementById('shift-preferred').href = `/shift_preferred/${year}/${month}`
-        document.getElementById('shift-generate').href = `/shift/${year}/${month}/generate`
-        document.getElementById('shift-edit').href = `/shift/${year}/${month}/edit`
-    };
-
-    prevButton.addEventListener('click', () => {
-        displayedDate.setMonth(displayedDate.getMonth() - 1);
-        renderMonth();
-        updateLinks();
-    });
-
-    nextButton.addEventListener('click', () => {
-        displayedDate.setMonth(displayedDate.getMonth() + 1);
-        renderMonth();
-        updateLinks();
-    });
-
-    renderMonth();
-    updateLinks();
-</script>
 <script type="module" src="/js/index.js"></script>
 </body>
-
 </html>
