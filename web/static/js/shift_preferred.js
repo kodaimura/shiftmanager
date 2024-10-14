@@ -95,11 +95,10 @@ const highlightSelectedDays = () => {
 const handleClickCell = (cell, day) => {
     const form = document.getElementById('shift-preferred-form');
     let selectedDays = form.elements['dates'].value.split(',');
-    if (!selectedDays.includes(day)) {
-        selectedDays.push(day);
+    if (!selectedDays.includes(String(day))) {
         cell.style.backgroundColor = 'yellow';
     } else {
-        selectedDays = selectedDays.filter(d => d !== day);
+        selectedDays = selectedDays.filter(d => d !== String(day));
         cell.style.backgroundColor = '';
     }
     form.elements['dates'].value = selectedDays.join(',');
@@ -128,6 +127,7 @@ const save = async () => {
     };
     try {
        await api.post(`shift_preferreds/me/${year}/${month}`, body);
+       window.location.replace('/');
     } catch (e) {
         console.error(e);
     }
