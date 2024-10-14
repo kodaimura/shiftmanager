@@ -9,11 +9,13 @@
 {{template "header" .}}
 
 <main class="container">
+<input type="hidden" id='year' value="{{.year}}">
+<input type="hidden" id='month' value="{{.month}}">
 <h1 class="h4 fw-bold">シフト作成・修正</h1>
 <div class="p-2 text-center fw-bold fs-3">
     {{.year}}年{{.month}}月
 </div>
-<div id="calendar">
+<div id="calendar" class="calendar">
     <table>
         <thead>
             <tr>
@@ -29,10 +31,54 @@
         <tbody></tbody>
     </table>
 </div>
+<div class="d-flex justify-content-between mt-3">
+    <form onsubmit="return false" id="shift-preferred-form">
+    	<input type="hidden" name='dates'>
+    	<button class="btn btn-primary btn" id="save">登録する</button>
+    </form>
+    <a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
+</div>
 
+<button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#generate-modal">シフト生成</button>
+<div class="modal fade" id="generate-modal" tabindex="-1"  aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">モーダルのタイトル</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="text-center mb-3">店休日を指定してください。</div>
+            <div id="modal-calendar" class="calendar">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日</th>
+                            <th>月</th>
+                            <th>火</th>
+                            <th>水</th>
+                            <th>木</th>
+                            <th>金</th>
+                            <th>土</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+            <form onsubmit="return false" id="generate-form">
+                <input type="hidden" name='store_holiday'>
+                <button type="button" class="btn btn-danger">生成する</button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
 
 {{template "footer"}}
-<script type="module" src="/js/shif.js"></script>
+<script type="module" src="/js/shift.js"></script>
 </body>
 </html>
