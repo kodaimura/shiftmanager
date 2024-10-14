@@ -1,4 +1,4 @@
-#calendar {
+.calendar {
     margin: auto;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -6,7 +6,7 @@
     overflow: hidden;
 }
 
-#calendar table {
+.calendar table {
     width: 100%;
     border-collapse: collapse;
     text-align: center;
@@ -14,14 +14,14 @@
     table-layout: fixed
 }
 
-#calendar table th {
+.calendar table th {
     background-color: #555;
     color: white;
     padding: 10px;
     font-weight: bold;
 }
 
-#calendar table td {
+.calendar table td {
     border: 1px solid #ddd;
     transition: background-color 0.3s;
     width: calc(100% / 7);
@@ -30,25 +30,25 @@
     height: 60px;
 }
 
-#calendar table div {
+.calendar table div {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-#calendar table td .weekday {
+.calendar table td .weekday {
     color: black;
 }
 
-#calendar table td .saturday {
+.calendar table td .saturday {
     color: blue;
 }
 
-#calendar table td .holiday {
+.calendar table td .holiday {
     color: red;
 }
 
-#calendar table td .day {
+.calendar table td .day {
     background-color: #f9f9f9;
     height: 1rem;
     font-size: 0.7rem;
@@ -56,7 +56,7 @@
     font-weight: 600;
 }
 
-#calendar table td .names {
+.calendar table td .names {
     padding-bottom: 3px;
     font-size: 0.75rem;
     flex-grow: 1;

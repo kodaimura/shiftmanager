@@ -8,7 +8,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     await fetchHolidays(year, month);
     await getShiftPreferred(year, month);
     
-
     renderCalendar(year, month);
     highlightSelectedDays();
     document.getElementById("save").addEventListener("click", save);

@@ -7,6 +7,6 @@ type PostShift struct {
 }
 
 type ShiftUri struct {
-    Year  int `form:"year" binding:"required"`
-    Month int `form:"month" binding:"required"`
+    Year  int `uri:"year" binding:"required"`
+    Month int `uri:"month" binding:"required"`
 }

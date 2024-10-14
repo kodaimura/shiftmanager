@@ -86,16 +86,13 @@ const renderCalendar = (year, month) => {
 const getShift = async (year, month) => {
     try {
         const result = await api.get(`shifts/${year}/${month}`);
-        for (let data of result) {
-            const accountId = data.account_id;
-            const dates = data.dates.split(',').map(Number);
-            for (let date of dates) {
-                const input = document.querySelector(`input[data-day='${date}']`);
-                if (input) {
-                    input.value = `${accountId} `;
-                }
-            };
-        }
+        const dates = result.shift_data.split(',');
+        for (let date of dates) {
+            const input = document.querySelector(`#calendar input[data-day='${date}']`);
+            if (input) {
+                input.value = data;
+            }
+        };
     } catch (e) {
         console.error(e);
     }

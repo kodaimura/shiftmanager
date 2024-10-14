@@ -1,4 +1,4 @@
-#calendar {
+.calendar {
     margin: auto;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -6,38 +6,38 @@
     overflow: hidden;
 }
 
-#calendar table {
+.calendar table {
     width: 100%;
     border-collapse: collapse;
     text-align: center;
     color: #333;
 }
 
-#calendar table th {
+.calendar table th {
     background-color: #555;
     color: white;
     padding: 10px;
     font-weight: bold;
 }
 
-#calendar table td {
+.calendar table td {
     padding: 15px;
     border: 1px solid #ddd;
     transition: background-color 0.3s;
 }
 
-#calendar table td.weekday {
+.calendar table td.weekday {
     color: black;
 }
 
-#calendar table td.saturday {
+.calendar table td.saturday {
     color: blue;
 }
 
-#calendar table td.holiday {
+.calendar table td.holiday {
     color: red;
 }
 
-#calendar table tr:nth-child(odd) td {
+.calendar table tr:nth-child(odd) td {
     background-color: #f9f9f9;
 }
