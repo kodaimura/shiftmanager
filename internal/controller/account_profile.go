@@ -57,3 +57,15 @@ func (ctr *AccountProfileController) ApiPost(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{})
 }
+
+// GET /api/account_profiles
+func (ctr *AccountProfileController) ApiGet(c *gin.Context) {
+	results, err := ctr.accountProfileService.Get()
+
+	if err != nil {
+		JsonError(c, 500, "プロフィール情報の取得に失敗しました。")
+		return
+	}
+
+	c.JSON(200, results)
+}

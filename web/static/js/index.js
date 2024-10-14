@@ -1,6 +1,7 @@
 import { api } from '/js/api.js';
 import { getJaTime } from '/js/script.js';
 
+let displayNameMap = {};
 let holidayCache = {};
 let targetDate;
 
@@ -8,6 +9,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     targetDate = new Date(getJaTime().getFullYear(), getJaTime().getMonth() + 1);
     getProfile();
 
+    await getDisplayNameMap();
     await fetchHolidays();
     renderCalendar();
     renderYearMonth();
@@ -45,10 +47,15 @@ const isHoliday = (year, month, day) => {
 };
 
 const getProfile = async () => {
+    const roleMap = {
+        '1': 'キッチン',
+        '2': 'ホール',
+        '3': 'キッチン・ホール',
+    }
     try {
         const result = await api.get('account_profiles/me');
         document.getElementById('display_name').textContent = result.display_name;
-        document.getElementById('account_role').textContent = result.account_role;
+        document.getElementById('account_role').textContent = roleMap[result.account_role];
     } catch (e) {
         console.error(e)
     }
@@ -116,9 +123,22 @@ const getShiftPreferred = async () => {
                     if (!cell.classList.contains('highlight')) {
                         cell.classList.add('highlight');
                     }
-                    cell.innerHTML += `${accountId}&nbsp;`;
+                    cell.innerHTML += `${displayNameMap[accountId]}&nbsp;`;
                 }
             };
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+const getDisplayNameMap = async () => {
+    try {
+        const result = await api.get('account_profiles');
+        for (let data of result) {
+            const accountId = data.account_id;
+            const displayName = data.display_name;
+            displayNameMap[accountId] = displayName;
         }
     } catch (e) {
         console.error(e);

@@ -11,6 +11,7 @@ import (
 )
 
 type AccountProfileService interface {
+	Get() ([]dto.AccountProfile, error)
 	GetOne(accountId int) (dto.AccountProfile, error)
 	Save(accountId int, input dto.SaveAccountProfile) error
 }
@@ -24,6 +25,20 @@ func NewAccountProfileService() AccountProfileService {
 		accountProfileRepository: repository.NewAccountProfileRepository(),
 	}
 }
+
+
+func (srv *accountProfileService) Get() ([]dto.AccountProfile, error) {
+	accountProfiles, err := srv.accountProfileRepository.Get(&model.AccountProfile{})
+	if err != nil {
+		logger.Error(err.Error())
+		return []dto.AccountProfile{}, err
+	}
+
+	var ret []dto.AccountProfile
+	utils.MapFields(&ret, accountProfiles)
+	return ret, nil
+}
+
 
 func (srv *accountProfileService) GetOne(accountId int) (dto.AccountProfile, error) {
 	accountProfile, err := srv.accountProfileRepository.GetOne(&model.AccountProfile{AccountId: accountId})

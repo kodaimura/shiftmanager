@@ -47,6 +47,7 @@ func SetApiRouter(r *gin.RouterGroup) {
 		auth.PUT("/accounts/me/password", ac.ApiPutPassword)
 		auth.DELETE("/accounts/me", ac.ApiDelete)
 
+		auth.GET("/account_profiles", apc.ApiGet)
 		auth.GET("/account_profiles/me", apc.ApiGetOne)
 		auth.POST("/account_profiles/me", apc.ApiPost)
 
