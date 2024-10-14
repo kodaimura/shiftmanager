@@ -160,7 +160,7 @@ const renderLinks = () => {
     const month = targetDate.getMonth() + 1;
 
     document.getElementById('shift-preferred').href = `/shift_preferreds/me/${year}/${month}`
-    document.getElementById('shift').href = `/shift/${year}/${month}`
+    document.getElementById('shift').href = `/shifts/${year}/${month}`
 };
 
 const handlePrevMonth = async () => {

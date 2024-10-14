@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+{{template "head" .}}
+<link rel="stylesheet" href="/css/shift.css">
+<script src="https://cdn.rawgit.com/osamutake/japanese-holidays-js/v1.0.10/lib/japanese-holidays.min.js"></script>
+</head>
+<body>
+{{template "header" .}}
+
+<main class="container">
+<h1 class="h4 fw-bold">シフト作成・修正</h1>
+<div class="p-2 text-center fw-bold fs-3">
+    {{.year}}年{{.month}}月
+</div>
+<div id="calendar">
+    <table>
+        <thead>
+            <tr>
+                <th>日</th>
+                <th>月</th>
+                <th>火</th>
+                <th>水</th>
+                <th>木</th>
+                <th>金</th>
+                <th>土</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+</main>
+
+{{template "footer"}}
+<script type="module" src="/js/shif.js"></script>
+</body>
+</html>
