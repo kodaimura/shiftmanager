@@ -11,6 +11,7 @@
     border-collapse: collapse;
     text-align: center;
     color: #333;
+    table-layout: fixed
 }
 
 #calendar table th {
@@ -23,6 +24,16 @@
 #calendar table td {
     border: 1px solid #ddd;
     transition: background-color 0.3s;
+    width: calc(100% / 7);
+    white-space: normal;
+    word-wrap: break-word;
+    height: 60px;
+}
+
+#calendar table div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 #calendar table td .weekday {
@@ -38,18 +49,15 @@
 }
 
 #calendar table td .day {
-    font-size: 0.8rem;
-    opacity: 0.6;
+    background-color: #f9f9f9;
+    height: 1rem;
+    font-size: 0.7rem;
+    opacity: 0.4;
+    font-weight: 600;
 }
 
 #calendar table td .names {
-    padding-left: 3px;
-    padding-right: 3px;
     padding-bottom: 3px;
-    font-size: 0.85rem;
-    min-height: 3rem;
-}
-
-#calendar table tr:nth-child(odd) td {
-    background-color: #f9f9f9;
+    font-size: 0.75rem;
+    flex-grow: 1;
 }

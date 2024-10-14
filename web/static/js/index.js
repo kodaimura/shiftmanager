@@ -77,6 +77,8 @@ const renderCalendar = async () => {
     }
 
     for (let day = 1; day <= lastDay.getDate(); day++) {
+        const cell = document.createElement('td');
+        const wrap = document.createElement('div');
         const div1 = document.createElement('div');
         const div2= document.createElement('div');
         div1.classList.add('day');
@@ -93,9 +95,9 @@ const renderCalendar = async () => {
         div1.textContent = day;
         div2.dataset.day = day;
 
-        const cell = document.createElement('td');
-        cell.appendChild(div1);
-        cell.appendChild(div2);
+        wrap.appendChild(div1);
+        wrap.appendChild(div2);
+        cell.appendChild(wrap);
 
         row.appendChild(cell);
         if ((firstDay.getDay() + day) % 7 === 0) {
