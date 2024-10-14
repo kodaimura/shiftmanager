@@ -9,6 +9,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     renderCalendar(year, month);
     renderModalCalendar(year, month);
     getShiftPreferred(year, month);
+    getShift(year, month);
+
+    document.getElementById("generate").addEventListener("click", postShiftgenerate);
 });
 
 const fetchHolidays = async (year, month) => {
@@ -170,6 +173,23 @@ const getShiftPreferred = async (year, month) => {
                 }
             };
         }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+const postShiftgenerate = async () => {
+    const year = parseInt(document.getElementById('year').value);
+    const month = parseInt(document.getElementById('month').value); 
+    const form = document.getElementById('generate-form');
+    let storeHoliday = form.elements['store_holiday'].value.split(',');
+
+    const body = {
+        store_holiday: storeHoliday,
+    };
+
+    try {
+        await api.post(`shifts/${year}/${month}`, body);
     } catch (e) {
         console.error(e);
     }

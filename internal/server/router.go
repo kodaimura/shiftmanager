@@ -60,5 +60,6 @@ func SetApiRouter(r *gin.RouterGroup) {
 
 		auth.GET("/shifts/:year/:month", sc.ApiGetOne)
 		auth.POST("/shifts/:year/:month", sc.ApiPost)
+		auth.POST("/shifts/:year/:month/generate", sc.ApiGenerate)
 	}
 }

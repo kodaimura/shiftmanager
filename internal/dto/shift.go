@@ -21,3 +21,9 @@ type SaveShift struct {
 	StoreHoliday *string `json:"store_holiday"`
 	Data *string `json:"shift_data"`
 }
+
+type GenerateShift struct {
+	Year int `json:"year"`
+	Month int `json:"month"`
+	StoreHoliday *string `json:"store_holiday"`
+}

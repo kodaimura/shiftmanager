@@ -1,6 +1,7 @@
 package service
 
 import (
+	"strings"
 	"database/sql"
 
 	"shiftmanager/internal/core/logger"
@@ -13,6 +14,7 @@ import (
 type ShiftService interface {
 	GetOne(input dto.ShiftPK) (dto.Shift, error)
 	Save(input dto.SaveShift) error
+	Generate(input dto.GenerateShift) error
 }
 
 type shiftService struct {
@@ -78,4 +80,40 @@ func (srv *shiftService) Save(input dto.SaveShift) error {
 	}
 
 	return nil
+}
+
+
+func (srv *shiftService) Generate(input dto.GenerateShift) error {
+	err := srv.shiftRepository.Delete(&model.Shift{
+		Year: input.Year, 
+		Month: input.Month,
+	}, nil)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	shiftData, err := srv.generateProc(strings.Split(*input.StoreHoliday, ","))
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	shift := model.Shift{
+		Year: input.Year,
+		Month: input.Month,
+		StoreHoliday: input.StoreHoliday,
+		Data: &shiftData,
+	}
+	if err = srv.shiftRepository.Insert(&shift, nil); err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+
+func (srv *shiftService) generateProc(storeHoliday []string) (string, error) {
+	return "", nil
 }
