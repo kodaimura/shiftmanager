@@ -89,7 +89,7 @@ const renderCalendar = (year, month) => {
 const getShift = async (year, month) => {
     try {
         const result = await api.get(`shifts/${year}/${month}`);
-        const dates = result.shift_data.split(',');
+        const dates = result.shift_data ? result.shift_data.split(',') : [];
         for (let date of dates) {
             const input = document.querySelector(`#calendar input[data-day='${date}']`);
             if (input) {
@@ -151,8 +151,9 @@ const renderModalCalendar = (year, month) => {
 
 const handleClickCell = (cell, day) => {
     const form = document.getElementById('generate-form');
-    let storeHoliday = form.elements['store_holiday'].value.split(',');
+    let storeHoliday = form.elements['store_holiday'].value.split(',').filter(item => item !== '');
     if (!storeHoliday.includes(String(day))) {
+        storeHoliday.push(day)
         cell.style.backgroundColor = 'gray';
     } else {
         storeHoliday = storeHoliday.filter(d => d !== String(day));
@@ -182,10 +183,8 @@ const postShiftgenerate = async () => {
     const year = parseInt(document.getElementById('year').value);
     const month = parseInt(document.getElementById('month').value); 
     const form = document.getElementById('generate-form');
-    let storeHoliday = form.elements['store_holiday'].value.split(',');
-
     const body = {
-        store_holiday: storeHoliday,
+        store_holiday: form.elements['store_holiday'].value,
     };
 
     try {
