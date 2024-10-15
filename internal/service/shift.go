@@ -19,11 +19,15 @@ type ShiftService interface {
 
 type shiftService struct {
 	shiftRepository repository.ShiftRepository
+	shiftPreferredRepository repository.ShiftPreferredRepository
+	accountProfileRepository repository.AccountProfileRepository
 }
 
 func NewShiftService() ShiftService {
 	return &shiftService{
 		shiftRepository: repository.NewShiftRepository(),
+		shiftPreferredRepository: repository.NewShiftPreferredRepository(),
+		accountProfileRepository: repository.NewAccountProfileRepository(),
 	}
 }
 
@@ -93,7 +97,7 @@ func (srv *shiftService) Generate(input dto.GenerateShift) error {
 		return err
 	}
 
-	shiftData, err := srv.generateProc(strings.Split(*input.StoreHoliday, ","))
+	shiftData, err := srv.generateProc(input)
 	if err != nil {
 		logger.Error(err.Error())
 		return err
@@ -114,6 +118,87 @@ func (srv *shiftService) Generate(input dto.GenerateShift) error {
 }
 
 
-func (srv *shiftService) generateProc(storeHoliday []string) (string, error) {
-	return "", nil
+func (srv *shiftService) generateProc(input dto.GenerateShift) (string, error) {
+	holidays, _ := utils.AtoiSlice(strings.Split(*input.StoreHoliday, ","))
+	dailyPreferreds, err := srv.getDailyPreferreds(input.Year, input.Month, holidays)
+	if err != nil {
+		return "", err
+	}
+
+	profileMap, err := srv.getProfileMap()
+	if err != nil {
+		return "", err
+	}
+	
+	return srv.generateCsvShift(dailyPreferreds, profileMap), nil
+}
+
+
+func (srv *shiftService) getDailyPreferreds(year, month int, holidays []int) ([32][]int, error) {
+	var ret [32][]int
+
+	preferreds, err := srv.shiftPreferredRepository.Get(&model.ShiftPreferred{
+		Year: year,
+		Month: month,
+	})
+	if err != nil {
+		return ret, err
+	}
+	
+	for _, p := range preferreds {
+		accountId := p.AccountId
+		dates, _ := utils.AtoiSlice(strings.Split(*p.Dates, ","))
+		for date := range dates {
+			ret[date] = append(ret[date], accountId)
+		}
+	}
+	return ret, nil
+}
+
+
+func (srv *shiftService) getProfileMap() (map[int]model.AccountProfile, error) {
+	var ret map[int]model.AccountProfile
+
+	profiles, err := srv.accountProfileRepository.Get(&model.AccountProfile{})
+	if err != nil {
+		return ret, err
+	}
+
+	for _, p := range profiles {
+		ret[p.AccountId] = p
+	}
+	return ret, nil 
+}
+
+
+func (srv *shiftService) generateCsvShift(dailyPreferreds [32][]int, profileMap map[int]model.AccountProfile) string {
+	var tmpShift [32][]int
+	var shift [32][]int
+	var tmpScore int
+	var score int
+	for _ = range 10000 {
+		tmpShift = srv.makeTmpShift(dailyPreferreds)
+		tmpScore = srv.evaluateShift(tmpShift, profileMap)
+		if score < tmpScore {
+			score = tmpScore
+			shift = tmpShift
+		}
+	}
+
+	return srv.toCsv(shift, profileMap)
+}
+
+
+func (srv *shiftService) makeTmpShift(dailyPreferreds [32][]int) [32][]int {	
+	return [32][]int{}
+}
+
+
+func (srv *shiftService) evaluateShift(shift [32][]int, profileMap map[int]model.AccountProfile) int {	
+	return 0
+}
+
+
+func (srv *shiftService) toCsv(shift [32][]int, profileMap map[int]model.AccountProfile) string {	
+	return ""
 }
