@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS shift (
 CREATE TRIGGER IF NOT EXISTS trg_shift_upd AFTER UPDATE ON shift
 BEGIN
 	UPDATE shift
-	SET UPDATE_AT = DATETIME('now', 'localtime') 
+	SET updated_at = DATETIME('now', 'localtime') 
 	WHERE rowid == NEW.rowid;
 END;
 
