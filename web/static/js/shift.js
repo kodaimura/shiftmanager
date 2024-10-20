@@ -188,7 +188,7 @@ const postShiftgenerate = async () => {
     };
 
     try {
-        await api.post(`shifts/${year}/${month}`, body);
+        await api.post(`shifts/${year}/${month}/generate`, body);
     } catch (e) {
         console.error(e);
     }
