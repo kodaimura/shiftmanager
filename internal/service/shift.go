@@ -3,9 +3,6 @@ package service
 import (
 	"fmt"
 	"strings"
-	"time"
-	"math"
-	"math/rand"
 	"database/sql"
 
 	"shiftmanager/internal/core/logger"
@@ -13,6 +10,7 @@ import (
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/model"
 	"shiftmanager/internal/repository"
+	"shiftmanager/internal/helper"
 )
 
 type ShiftService interface {
@@ -101,7 +99,14 @@ func (srv *shiftService) Generate(input dto.GenerateShift) error {
 		return err
 	}
 
-	shiftData, err := srv.generateProc(input)
+	holidays, _ := utils.AtoiSlice(strings.Split(*input.StoreHoliday, ","))
+	shiftGenerator := helper.NewShiftGenerator(input.Year, input.Month, holidays)
+	err = shiftGenerator.InitRepositories()
+	if err != nil {
+		return fmt.Errorf("failed to initialize generator repositories: %v", err)
+	}
+
+	shiftCsv, err := shiftGenerator.GenerateCsvShift()
 	if err != nil {
 		logger.Error(err.Error())
 		return err
@@ -111,7 +116,7 @@ func (srv *shiftService) Generate(input dto.GenerateShift) error {
 		Year: input.Year,
 		Month: input.Month,
 		StoreHoliday: input.StoreHoliday,
-		Data: &shiftData,
+		Data: &shiftCsv,
 	}
 	if err = srv.shiftRepository.Insert(&shift, nil); err != nil {
 		logger.Error(err.Error())
@@ -119,179 +124,4 @@ func (srv *shiftService) Generate(input dto.GenerateShift) error {
 	}
 
 	return nil
-}
-
-
-func (srv *shiftService) generateProc(input dto.GenerateShift) (string, error) {
-	holidays, _ := utils.AtoiSlice(strings.Split(*input.StoreHoliday, ","))
-	dailyPreferreds, err := srv.getDailyPreferreds(input.Year, input.Month, holidays)
-	if err != nil {
-		return "", err
-	}
-
-	profileMap, err := srv.getProfileMap()
-	if err != nil {
-		return "", err
-	}
-	
-	return srv.generateCsvShift(dailyPreferreds, profileMap), nil
-}
-
-
-func (srv *shiftService) getDailyPreferreds(year, month int, holidays []int) ([31][]int, error) {
-	var ret [31][]int
-
-	preferreds, err := srv.shiftPreferredRepository.Get(&model.ShiftPreferred{
-		Year: year,
-		Month: month,
-	})
-	if err != nil {
-		return ret, err
-	}
-	
-	for _, p := range preferreds {
-		accountId := p.AccountId
-		dates, _ := utils.AtoiSlice(strings.Split(*p.Dates, ","))
-		for _, date := range dates {
-			ret[date - 1] = append(ret[date - 1], accountId)
-		}
-	}
-	fmt.Println(ret)
-	return ret, nil
-}
-
-
-func (srv *shiftService) getProfileMap() (map[int]model.AccountProfile, error) {
-	ret := make(map[int]model.AccountProfile)
-
-	profiles, err := srv.accountProfileRepository.Get(&model.AccountProfile{})
-	if err != nil {
-		return ret, err
-	}
-
-	for _, p := range profiles {
-		ret[p.AccountId] = p
-	}
-	return ret, nil 
-}
-
-
-func (srv *shiftService) generateCsvShift(dailyPreferreds [31][]int, profileMap map[int]model.AccountProfile) string {
-	var tmpShift [31][]int
-	var shift [31][]int
-	tmpScore := 0
-	score := 0
-	for _ = range 700000 {
-		tmpShift = srv.makeTmpShift(dailyPreferreds)
-		tmpScore = srv.evaluateShift(tmpShift, profileMap)
-		if score < tmpScore {
-			fmt.Println(tmpScore)
-			fmt.Println(tmpShift)
-			counts := make(map[int]int)
-			for _, tmp := range shift {
-				for _, x:= range tmp {
-					counts[x]++
-				}
-			}
-			fmt.Println(counts)
-			score = tmpScore
-			shift = tmpShift
-		}
-	}
-
-	return srv.toCsvShift(shift, profileMap)
-}
-
-
-func (srv *shiftService) makeTmpShift(dailyPreferreds [31][]int) [31][]int {
-	var tmp [31][]int
-	for i := range 31 {
-		tmp[i] = randomPick(dailyPreferreds[i])
-	}
-	return tmp
-}
-
-
-func randomPick(slice []int) []int {
-	if len(slice) <= 2 {
-		return slice
-	}
-	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(slice), func(i, j int) {
-		slice[i], slice[j] = slice[j], slice[i]
-	})
-
-	return slice[:2]
-}
-
-
-func (srv *shiftService) evaluateShift(shift [31][]int, profileMap map[int]model.AccountProfile) int {
-	return srv.evaluateUniformity(shift) - srv.evaluateRolePenalty(shift, profileMap)
-}
-
-
-func (srv *shiftService) evaluateUniformity(shift [31][]int) int {
-	counts := make(map[int]int)
-	for _, tmp := range shift {
-		for _, x:= range tmp {
-			counts[x]++
-		}
-	}
-
-	total := 0.0
-	for _, num := range counts {
-		total += float64(num)
-	}
-
-	mean := total / float64(len(counts))
-
-	var varianceSum float64
-	for _, num := range counts {
-		varianceSum += math.Pow(float64(num)-mean, 2)
-	}
-
-	variance := varianceSum / float64(len(counts))
-	stdDev := math.Sqrt(variance)
-
-	if stdDev == 0 {
-		return 100
-	}
-	return int(math.Min((1 / stdDev) * 100, 100))
-}
-
-
-func (srv *shiftService) evaluateRolePenalty(shift [31][]int, profileMap map[int]model.AccountProfile) int {
-	penalty := 0
-	for i := range 31 {
-		if len(shift[i]) < 2 {
-			continue
-		}
-		if profileMap[shift[i][0]].AccountRole == "1" && profileMap[shift[i][1]].AccountRole == "1" {
-			// キッチン2人なら減点1
-			penalty += 1
-		}
-		if profileMap[shift[i][0]].AccountRole == "2" && profileMap[shift[i][1]].AccountRole == "2" {
-			// ホール2人なら減点2
-			penalty += 2
-		}
-	}
-	return penalty
-}
-
-
-func (srv *shiftService) toCsvShift(shift [31][]int, profileMap map[int]model.AccountProfile) string {
-	ret := ""
-	for i := range 31 {
-		l := len(shift[i])
-		if l == 0 {
-			ret += ","
-		}
-		if l == 1 {
-			ret += profileMap[shift[i][0]].DisplayName + ","
-		}
-		if l == 2 {
-			ret += profileMap[shift[i][0]].DisplayName + " " + profileMap[shift[i][1]].DisplayName + ","
-		}
-	}
-	return ret[:len(ret)-1]
 }
