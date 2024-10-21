@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 	"strings"
@@ -16,7 +15,7 @@ type ShiftGenerator struct {
 	year          int
 	month         int
 	holidays      []int
-	dailyPreferreds [31][]int
+	dailyPreferreds *[31][]int
 	profileMap    map[int]model.AccountProfile
 }
 
@@ -43,7 +42,7 @@ func (gen *ShiftGenerator) InitRepositories() error {
 	return nil
 }
 
-func (gen *ShiftGenerator) getDailyPreferreds() ([31][]int, error) {
+func (gen *ShiftGenerator) getDailyPreferreds() (*[31][]int, error) {
 	var ret [31][]int
 
 	shiftPreferredRepo := repository.NewShiftPreferredRepository()
@@ -52,7 +51,7 @@ func (gen *ShiftGenerator) getDailyPreferreds() ([31][]int, error) {
 		Month: gen.month,
 	})
 	if err != nil {
-		return ret, err
+		return &ret, err
 	}
 
 	for _, p := range preferreds {
@@ -62,7 +61,7 @@ func (gen *ShiftGenerator) getDailyPreferreds() ([31][]int, error) {
 			ret[date-1] = append(ret[date-1], accountId)
 		}
 	}
-	return ret, nil
+	return &ret, nil
 }
 
 func (gen *ShiftGenerator) getProfileMap() (map[int]model.AccountProfile, error) {
@@ -80,28 +79,30 @@ func (gen *ShiftGenerator) getProfileMap() (map[int]model.AccountProfile, error)
 	return ret, nil
 }
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 func (gen *ShiftGenerator) GenerateCsvShift() (string, error) {
-	shift := [31][]int{}
-	tmpShift := [31][]int{}
+	shift := new([31][]int)
+	tmpShift := new([31][]int)
 	tmpScore := 0
 	score := 0
 
-	for _ = range 700000 {
-		tmpShift = gen.makeTmpShift()
-		tmpScore = gen.evaluateShift(tmpShift)
+	for i := 0; i < 700000; i++ {
 		if score < tmpScore {
 			fmt.Println(tmpScore)
 			fmt.Println(tmpShift)
 			score = tmpScore
-			shift = tmpShift
+			*shift = *tmpShift
 		}
 	}
 
 	return gen.toCsvShift(shift), nil
 }
 
-func (gen *ShiftGenerator) makeTmpShift() [31][]int {
-	var tmp [31][]int
+func (gen *ShiftGenerator) makeTmpShift() *[31][]int {
+	tmp := new([31][]int)
 	for i := 0; i < 31; i++ {
 		tmp[i] = randomPick(gen.dailyPreferreds[i])
 	}
@@ -112,19 +113,20 @@ func randomPick(slice []int) []int {
 	if len(slice) <= 2 {
 		return slice
 	}
-	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(slice), func(i, j int) {
-		slice[i], slice[j] = slice[j], slice[i]
-	})
+	first := rand.Intn(len(slice))
+	second := rand.Intn(len(slice) - 1)
+	if second >= first {
+		second++
+	}
 
-	return slice[:2]
+	return []int{slice[first], slice[second]}
 }
 
-func (gen *ShiftGenerator) evaluateShift(shift [31][]int) int {
+func (gen *ShiftGenerator) evaluateShift(shift *[31][]int) int {
 	return gen.evaluateUniformity(shift) - gen.evaluateRolePenalty(shift)
 }
 
-func (gen *ShiftGenerator) evaluateUniformity(shift [31][]int) int {
+func (gen *ShiftGenerator) evaluateUniformity(shift *[31][]int) int {
 	counts := make(map[int]int)
 	for _, tmp := range shift {
 		for _, x := range tmp {
@@ -153,7 +155,7 @@ func (gen *ShiftGenerator) evaluateUniformity(shift [31][]int) int {
 	return int(math.Min((1/stdDev)*100, 100))
 }
 
-func (gen *ShiftGenerator) evaluateRolePenalty(shift [31][]int) int {
+func (gen *ShiftGenerator) evaluateRolePenalty(shift *[31][]int) int {
 	penalty := 0
 	for i := 0; i < 31; i++ {
 		if len(shift[i]) < 2 {
@@ -169,7 +171,7 @@ func (gen *ShiftGenerator) evaluateRolePenalty(shift [31][]int) int {
 	return penalty
 }
 
-func (gen *ShiftGenerator) toCsvShift(shift [31][]int) string {
+func (gen *ShiftGenerator) toCsvShift(shift *[31][]int) string {
 	ret := ""
 	for i := 0; i < 31; i++ {
 		l := len(shift[i])
