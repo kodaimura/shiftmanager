@@ -90,9 +90,9 @@ func (gen *ShiftGenerator) GenerateCsvShift() (string, error) {
 	score := 0
 
 	for i := 0; i < 700000; i++ {
+		tmpShift = gen.makeTmpShift()
+		tmpScore = gen.evaluateShift(tmpShift)
 		if score < tmpScore {
-			fmt.Println(tmpScore)
-			fmt.Println(tmpShift)
 			score = tmpScore
 			*shift = *tmpShift
 		}
