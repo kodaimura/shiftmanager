@@ -35,6 +35,10 @@ func (gen *ShiftGenerator) InitRepositories() error {
 		return err
 	}
 
+	for _, d := range gen.holidays {
+		gen.dailyPreferreds[d-1] = []int{}
+	}
+
 	gen.profileMap, err = gen.getProfileMap()
 	if err != nil {
 		return err

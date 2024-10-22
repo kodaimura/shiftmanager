@@ -89,11 +89,22 @@ const renderCalendar = (year, month) => {
 const getShift = async (year, month) => {
     try {
         const result = await api.get(`shifts/${year}/${month}`);
-        const dates = result.shift_data ? result.shift_data.split(',') : [];
-        for (let date of dates) {
-            const input = document.querySelector(`#calendar input[data-day='${date}']`);
+        const shift = result.shift_data ? result.shift_data.split(',') : [];
+        for (let i = 1; i <= 31; i++) {
+            const input = document.querySelector(`#calendar input[data-day='${i}']`);
             if (input) {
-                input.value = data;
+                input.value = shift[i - 1];
+            }
+        };
+
+        const form = document.getElementById('generate-form');
+        form.elements['store_holiday'].value = result.store_holiday;
+
+        const storeHoliday = result.store_holiday.split(',').filter(item => item !== '');
+        for (let i = 1; i <= 31; i++) {
+            const cell = document.querySelector(`#modal-calendar tbody div[data-day='${i}']`);
+            if (storeHoliday.includes(String(i))) {
+                cell.style.backgroundColor = 'gray';
             }
         };
     } catch (e) {
