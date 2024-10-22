@@ -11,7 +11,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     getShiftPreferred(year, month);
     getShift(year, month);
 
-    document.getElementById("generate").addEventListener("click", postShiftgenerate);
+    document.getElementById("generate").addEventListener("click", async (event) => {
+        event.target.disabled = true;
+        await postShiftgenerate();
+        event.target.disabled = false;
+    });
 });
 
 const fetchHolidays = async (year, month) => {
