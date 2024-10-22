@@ -200,6 +200,9 @@ const postShiftgenerate = async () => {
 
     try {
         await api.post(`shifts/${year}/${month}/generate`, body);
+        const modal = bootstrap.Modal.getInstance('#generate-modal');
+        modal.hide();
+        getShift(year, month);
     } catch (e) {
         console.error(e);
     }
