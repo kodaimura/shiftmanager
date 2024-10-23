@@ -77,6 +77,7 @@ const renderCalendar = (year, month) => {
         }
         div1.textContent = day;
         input.dataset.day = day;
+        input.onchange = setCounter;
 
         div2.appendChild(input);
         wrap.appendChild(div1);
@@ -116,6 +117,8 @@ const getShift = async (year, month) => {
                 cell.style.backgroundColor = 'gray';
             }
         };
+
+        setCounter();
     } catch (e) {
         console.error(e);
     }
@@ -246,3 +249,29 @@ const save = async () => {
         console.error(e);
     }
 };
+
+const setCounter = () => {
+    let countMap = {};
+    for (let i = 1; i <= 31; i++) {
+        const input = document.querySelector(`#calendar input[data-day='${i}']`);
+        if (input) {
+            const names = input.value.split(/\s+/).filter(Boolean);
+            for (const x of names) {
+                if (countMap[x]) {
+                    countMap[x] += 1
+                } else {
+                    countMap[x] = 1
+                }
+            }
+        }
+    };
+
+    let str = '';
+    for (const x in countMap) {
+        str += `${x}:${countMap[x]}  `;
+    }
+
+    const tooltipIcon = document.getElementById('counter');
+    tooltipIcon.setAttribute('title', str);
+    new bootstrap.Tooltip(tooltipIcon);
+}

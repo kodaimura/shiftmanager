@@ -31,6 +31,10 @@
         <tbody></tbody>
     </table>
 </div>
+<div>
+    <i class="bi bi-three-dots" style="font-size: 1.3rem;" data-bs-toggle="tooltip" data-bs-placement="top" id="counter"></i>
+</div>
+<div id="counter"></div>
 <div class="d-flex justify-content-between mt-3">
     <button class="btn btn-primary btn" id="save">登録する</button>
     <a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
@@ -76,6 +80,10 @@
 </main>
 
 {{template "footer"}}
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+</script>
 <script type="module" src="/js/shift.js"></script>
 </body>
 </html>
