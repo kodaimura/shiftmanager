@@ -16,6 +16,11 @@ window.addEventListener("DOMContentLoaded", async () => {
         await postShiftgenerate();
         event.target.disabled = false;
     });
+    document.getElementById("save").addEventListener("click", async (event) => {
+        event.target.disabled = true;
+        await save();
+        event.target.disabled = false;
+    });
 });
 
 const fetchHolidays = async (year, month) => {
@@ -211,3 +216,33 @@ const postShiftgenerate = async () => {
         console.error(e);
     }
 }
+
+const save = async () => {
+    const year = parseInt(document.getElementById('year').value);
+    const month = parseInt(document.getElementById('month').value);
+    let shift = '';
+    for (let i = 1; i <= 31; i++) {
+        const input = document.querySelector(`#calendar input[data-day='${i}']`);
+        if (input) {
+            shift += input.value + ','
+        } else {
+            shift += ','
+        }
+    };
+    shift = shift.replace(/,\s*$/, '')
+    shift = shift.replace(/\u3000/g, ' ');
+    shift = shift.replace(/\s+/g, ' ');
+    shift = shift.trim();
+
+    const form = document.getElementById('generate-form');
+    const body = {
+        shift_data: shift,
+        store_holiday: form.elements['store_holiday'].value,
+    };
+    try {
+       await api.post(`shifts/${year}/${month}`, body);
+       getShift(year, month);
+    } catch (e) {
+        console.error(e);
+    }
+};

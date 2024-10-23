@@ -8,7 +8,7 @@ type ShiftUri struct {
 
 type PostShift struct {
 	StoreHoliday *string `json:"store_holiday"`
-	Data *string `json:"data"`
+	Data *string `json:"shift_data"`
 }
 
 type PostShiftGenerate struct {
