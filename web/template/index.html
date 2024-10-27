@@ -9,6 +9,7 @@
 {{template "header" .}}
 
 <main class="container">
+<h2 class="h4 fw-bold">プロフィール</h2>
 <div class="table-responsive">
     <table class="table">
         <thead class="table-active">
@@ -27,14 +28,16 @@
         </tbody>
     </table>
 </div>
+
+<h2 class="h4 fw-bold mt-3">シフト登録状況</h2>
 <div class="d-flex align-items-center justify-content-center">
-    <button class="btn btn-outline-dark me-3" id="prev-month">
+    <button class="btn btn-outline-dark" id="prev-month">
         <i class="bi bi-arrow-left"></i>
     </button>
-    <div class="p-2 text-center fw-bold fs-3">
+    <div class="p-2 text-center fw-bold fs-4">
         <span id="year"></span>年<span id="month"></span>月
     </div>
-    <button class="btn btn-outline-dark ms-3" id="next-month">
+    <button class="btn btn-outline-dark" id="next-month">
         <i class="bi bi-arrow-right"></i>
     </button>
 </div>
