@@ -4,6 +4,7 @@ import (
 	"net/http"
 	
 	"github.com/gin-gonic/gin"
+	"shiftmanager/config"
 	"shiftmanager/internal/core/jwt"
 )
 
@@ -33,11 +34,10 @@ func JwtAuthApiMiddleware() gin.HandlerFunc {
 
 func BasicAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username := "admin"
-		password := "pass"
+		cf := config.GetConfig()
 
 		user, pass, ok := c.Request.BasicAuth()
-		if !ok || user != username || pass != password {
+		if !ok || user != cf.BasicAuthUser || pass != cf.BasicAuthPass {
 			c.Header("WWW-Authenticate", "Basic realm=Authorization Required")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return

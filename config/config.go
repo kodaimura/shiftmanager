@@ -23,8 +23,11 @@ type Config struct {
 
 	MailHost string
 	MailPort string
-	MailAccount string
+	MailUser string
 	MailPass string
+
+	BasicAuthUser string
+	BasicAuthPass string
 
 	JwtSecretKey string
 	LogLevel string
@@ -53,8 +56,11 @@ func init() {
 
 	cf.MailHost = os.Getenv("MAIL_HOST")
 	cf.MailPort = os.Getenv("MAIL_PORT")
-	cf.MailAccount = os.Getenv("MAIL_USER")
+	cf.MailUser = os.Getenv("MAIL_USER")
 	cf.MailPass = os.Getenv("MAIL_PASSWORD")
+
+	cf.BasicAuthUser = os.Getenv("BASIC_AUTH_USER")
+	cf.BasicAuthPass = os.Getenv("BASIC_AUTH_PASSWORD")
 
 	cf.JwtSecretKey = os.Getenv("JWT_SECRET_KEY")
 	cf.LogLevel = os.Getenv("LOG_LEVEL")
