@@ -1,75 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+{{template "head" .}}
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
 {{template "header" .}}
-<h2>{{.username}}</h2>
-<div class="table-responsive">
-<table class="table">
-<thead class="table-active">
-    <tr>
-        <th scope="col">所属</th>
-        <th scope="col">表示名</th>
-        <th scope="col">
-            <div class="d-flex justify-content-between">
-                <div>役割</div>
-                <div><a href="/profile">プロフ登録</a></div>
-            </div>
-        </th>
-    </tr>
-</thead>
-<tbody>
-    <tr>
-        <td>{{.profile.GroupName}}</td>
-        <td>{{.profile.AbbName}}</td>
-        <td>{{.profile.RoleName}}</td>
-    </tr>
-</tbody>
-</table>
-</div>
 
-<div>
-    <a id="workablelink" class="mb-1 btn btn-secondary" role="button">シフト提出・修正</a>
-</div>
-
+<main class="container">
+<h2 class="h4 fw-bold">プロフィール</h2>
 <div class="table-responsive">
     <table class="table">
-    <thead class="table-active">
-        <tr>
-            <th scope="col"></th>
-            <th scope="col">
-                <span id="month"></span>月 提出状況
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        {{ range .workabledays }}
-        <tr>
-            <td>{{ .AbbName }}</td>
-            <td>{{ .WorkableDays }}</td>
-        </tr>
-        {{ end }}
-    </tbody>
+        <thead class="table-active">
+            <tr>
+                <th>表示名</th>
+                <th>役割</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="display_name"></td>
+                <td id="account_role"></td>
+                <td><a href="/account_profiles/me">プロフ登録</a></td>
+            </tr>
+        </tbody>
     </table>
 </div>
-<div>
-  <a id="shiftlink1" class="my-3 btn btn-primary" role="button">
-  来月シフト作成・修正</a>
-  <a id="shiftlink2" class="btn btn-outline-secondary" role="button">
-  今月シフト修正</a>
+
+<h2 class="h4 fw-bold mt-3">シフト登録状況</h2>
+<div class="d-flex align-items-center justify-content-center">
+    <button class="btn btn-outline-dark" id="prev-month">
+        <i class="bi bi-arrow-left"></i>
+    </button>
+    <div class="p-2 text-center fw-bold fs-4">
+        <span id="year"></span>年<span id="month"></span>月
+    </div>
+    <button class="btn btn-outline-dark" id="next-month">
+        <i class="bi bi-arrow-right"></i>
+    </button>
 </div>
+<div>
 
-<script>
-  let date = new Date()
-  let nm = new Date(date.getFullYear(), date.getMonth() + 1, 1)
-  document.getElementById("workablelink").href = 
-  `/workable/${nm.getFullYear()}/${nm.getMonth() + 1}`
+<div id="calendar" class="calendar">
+    <table>
+        <thead>
+            <tr>
+                <th>日</th>
+                <th>月</th>
+                <th>火</th>
+                <th>水</th>
+                <th>木</th>
+                <th>金</th>
+                <th>土</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-between mt-3">
+    <a id="shift-preferred" class="mb-1 btn btn-outline-primary">シフト提出</a>
+    <a id="shift" class="mb-1 btn btn-outline-danger">シフト作成・編集</a>
+</div>
+</main>
 
-  document.getElementById("shiftlink1").href = 
-  `/shift/${nm.getFullYear()}/${nm.getMonth() + 1}`
-
-  document.getElementById("shiftlink2").href = 
-  `/shift/${date.getFullYear()}/${date.getMonth() + 1}`
-
-  document.getElementById("month").innerHTML = `${nm.getMonth() + 1}`
-</script>
-{{template "footer"}}
-
-
-
+{{template "footer" .}}
+<script type="module" src="/js/index.js"></script>
+</body>
+</html>

@@ -1,36 +1,90 @@
-{{template "header" .}}
-<script src="https://cdn.rawgit.com/osamutake/japanese-holidays-js/v1.0.10/lib/japanese-holidays.min.js"></script>
-
-<input type="hidden" id='year' name='year' value="{{.year}}">
-<input type="hidden" id='month' name='month' value="{{.month}}">
-<input type="hidden" id="candidate" value="{{ .candidate }}">
-<input type="hidden" id="shift" name="shift" value="{{ .shift }}">
-<input type="hidden" id="storeholiday" name="storeholiday" value="{{ .storeholiday }}">
-
-<div class="mb-1">
-	<h4>{{.year}}年{{.month}}月</h4>
-</div>
-<div id="calendar"></div>
-
-<div class="row">
-	<span id="count"></span>
-</div>
-<div class="row text-primary">
-	<span id="message"></span>
-</div>
-
-<div class="my-3">
-	<input type="button" id="submit" class="btn btn-primary" value="保存">
-	<span id="error" class="text-danger"></span>
-</div>
-
-<div class="my-3">
-	<a href="/shift/{{.year}}/{{.month}}/storeholiday" class="btn btn-outline-dark" role="button">
-	シフト再作成
-	</a>
-	<a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
-</div>
-
+<!DOCTYPE html>
+<html>
+<head>
+{{template "head" .}}
 <link rel="stylesheet" href="/css/shift.css">
-<script type="text/javascript" src="/js/shift.js"></script>
+<script src="https://cdn.rawgit.com/osamutake/japanese-holidays-js/v1.0.10/lib/japanese-holidays.min.js"></script>
+</head>
+<body>
+{{template "header" .}}
+
+<main class="container">
+<input type="hidden" id='year' value="{{.year}}">
+<input type="hidden" id='month' value="{{.month}}">
+<div class="p-2 text-center fw-bold fs-4">
+    {{.year}}年{{.month}}月
+</div>
+<div id="calendar" class="calendar">
+    <table>
+        <thead>
+            <tr>
+                <th>日</th>
+                <th>月</th>
+                <th>火</th>
+                <th>水</th>
+                <th>木</th>
+                <th>金</th>
+                <th>土</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<div>
+    <i class="bi bi-three-dots" style="font-size: 1.3rem;" data-bs-toggle="tooltip" data-bs-placement="top" id="counter"></i>
+</div>
+<div id="counter"></div>
+<div class="d-flex justify-content-between mt-3">
+    <div>
+        <button class="btn btn-primary btn" id="save">保存する</button>
+        <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#generate-modal">自動生成</button>
+    </div>
+    <a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
+</div>
+
+<div class="modal fade" id="generate-modal" tabindex="-1"  aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">自動生成</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="text-center mb-3">店休日を指定してください。</div>
+            <div id="modal-calendar" class="calendar">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日</th>
+                            <th>月</th>
+                            <th>火</th>
+                            <th>水</th>
+                            <th>木</th>
+                            <th>金</th>
+                            <th>土</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+            <form onsubmit="return false" id="generate-form">
+                <input type="hidden" name='store_holiday'>
+                <button type="button" class="btn btn-danger" id="generate">生成する</button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
 {{template "footer"}}
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+</script>
+<script type="module" src="/js/shift.js"></script>
+</body>
+</html>

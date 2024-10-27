@@ -1,0 +1,8 @@
+{
+    "background_color": "white",
+    "description": "シフト管理アプリ.",
+    "display": "fullscreen",
+    "name": "shiftmanager",
+    "short_name": "shiftmanager",
+    "start_url": "/"
+  }

@@ -1,46 +1,79 @@
-.holiday {
-    color: red;
+.calendar {
+    margin: auto;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-.storeholiday {
-    opacity: 0.4;
+.calendar table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    color: #333;
+    table-layout: fixed
 }
 
-td:first-child {
-    color: red;
-}
-
-td:last-child {
-    color: royalblue;
-}
-
-td input {
-    border: none;
-    width:100%;
-    font-size: 1.1rem;
-}
-
-th {
+.calendar table th {
+    padding: 8px; 
+    background-color: #ededed;
+    font-weight: bold;
     border: 1px solid #bbb;
-    text-align: center;
-    background-color: #ffa;
+    border-bottom: 1px solid #555;
 }
 
-td {
+.calendar table td {
     border: 1px solid #ddd;
-    text-align: center;
-    min-width: 75px;
-    height: 70px;
+    transition: background-color 0.3s;
+    width: calc(100% / 7);
+    height: 55px;
 }
 
-th:first-child {
+.calendar table th:first-child {
+    color: red;
+    border-bottom: 1px solid red;
+}
+
+.calendar table th:last-child {
+    color: blue;
+    border-bottom: 1px solid blue;
+}
+
+.calendar table td .weekday {
+    color: black;
+}
+
+.calendar table td .saturday {
+    color: blue;
+}
+
+.calendar table td .holiday {
     color: red;
 }
 
-th:last-child {
-    color: royalblue;
+.calendar table td div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-header {
-    min-width: 550px;
+.calendar table td .day {
+    background-color: #f9f9f9;
+    height: 1rem;
+    font-size: 0.7rem;
+    opacity: 0.6;
+    font-weight: 600;
+}
+
+.calendar table td .names {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.calendar table td .names input {
+    border: 0;
+    width: 95%;
+    font-size: 0.8rem;
+    text-align: center;
 }

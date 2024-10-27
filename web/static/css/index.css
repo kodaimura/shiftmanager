@@ -1,0 +1,62 @@
+.calendar {
+    margin: auto;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.calendar table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    color: #333;
+    table-layout: fixed
+}
+
+.calendar table th {
+    background-color: #555;
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+}
+
+.calendar table td {
+    border: 1px solid #ddd;
+    transition: background-color 0.3s;
+    width: calc(100% / 7);
+    white-space: normal;
+    word-wrap: break-word;
+    height: 60px;
+}
+
+.calendar table div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.calendar table td .weekday {
+    color: black;
+}
+
+.calendar table td .saturday {
+    color: blue;
+}
+
+.calendar table td .holiday {
+    color: red;
+}
+
+.calendar table td .day {
+    background-color: #f9f9f9;
+    height: 1rem;
+    font-size: 0.7rem;
+    opacity: 0.6;
+    font-weight: 600;
+}
+
+.calendar table td .names {
+    padding-bottom: 3px;
+    font-size: 0.75rem;
+    flex-grow: 1;
+}

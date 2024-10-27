@@ -1,2 +1,2 @@
-# ShiftManager
-身内用シフト自動生成アプリ
+# GOAT
+## Go Web Application Template

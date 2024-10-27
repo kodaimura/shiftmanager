@@ -1,28 +1,8 @@
-
 {{define "header"}}
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<link rel="stylesheet" href="/css/style.css">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-<title>{{.appname}}</title>
-</head>
-<body>
-<header class="mb-3">
-	<nav class="navbar navbar-dark bg-secondary">
-  	<div class="container-fluid">
-    	<a class="navbar-brand" href="/">{{.appname}}</a>
-    	<ul class="navbar-nav mr-auto">
-      	<li class="nav-item">
-        	<a class="nav-link active" href="/logout">ログアウト</a>
-      	</li>
-    	</ul>
-  	</div>
+<header>
+	<nav class="navbar fixed-top navbar-expand-sm bg-secondary">
+		<span class="navbar-brand px-3 text-white">シフト管理</span>
 	</nav>
 </header>
-<main class="mx-sm-1">
-	<div class="container wrapper">
-	<div class="justify-content-center">
+<div style="width:100%;height:70px"></div>
 {{end}}
