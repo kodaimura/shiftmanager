@@ -149,8 +149,10 @@ const save = async () => {
     };
     try {
        await api.post(`shift_preferreds/me/${year}/${month}`, body);
-       window.location.replace('/');
+       alert('保存しました。')
+       location.reload();
     } catch (e) {
+        alert('保存に失敗しました。')
         console.error(e);
     }
 };

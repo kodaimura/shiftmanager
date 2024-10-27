@@ -248,8 +248,10 @@ const postShiftgenerate = async () => {
         await api.post(`shifts/${year}/${month}/generate`, body);
         const modal = bootstrap.Modal.getInstance('#generate-modal');
         modal.hide();
+        alert('保存しました。')
         getShift(year, month);
     } catch (e) {
+        alert('保存に失敗しました。')
         console.error(e);
     }
 }
@@ -278,8 +280,10 @@ const save = async () => {
     };
     try {
        await api.post(`shifts/${year}/${month}`, body);
+       alert('保存しました。')
        getShift(year, month);
     } catch (e) {
+        alert('保存に失敗しました。')
         console.error(e);
     }
 };
