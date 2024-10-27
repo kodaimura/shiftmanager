@@ -87,6 +87,9 @@ const renderCalendar = (year, month) => {
         const tooltip = new bootstrap.Tooltip(input);
         input.focus = () => tooltip.show();
         input.blur = () => tooltip.hide();
+        input.oninput = () => {
+            input.value = input.value.replace(/　/g, ' ');
+        };
 
         div2.appendChild(input);
         wrap.appendChild(div1);
