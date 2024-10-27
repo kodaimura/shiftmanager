@@ -11,7 +11,7 @@
 <main class="container">
 <input type="hidden" id='year' value="{{.year}}">
 <input type="hidden" id='month' value="{{.month}}">
-<h1 class="h4 fw-bold">シフト作成・修正</h1>
+<h1 class="h4 fw-bold">シフト作成・編集</h1>
 <div class="p-2 text-center fw-bold fs-4">
     {{.year}}年{{.month}}月
 </div>
@@ -36,16 +36,18 @@
 </div>
 <div id="counter"></div>
 <div class="d-flex justify-content-between mt-3">
-    <button class="btn btn-primary btn" id="save">登録する</button>
+    <div>
+        <button class="btn btn-primary btn" id="save">保存する</button>
+        <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#generate-modal">自動生成</button>
+    </div>
     <a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
 </div>
 
-<button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#generate-modal">シフト生成</button>
 <div class="modal fade" id="generate-modal" tabindex="-1"  aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">モーダルのタイトル</h5>
+          <h5 class="modal-title">自動生成</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">

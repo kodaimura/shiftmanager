@@ -21,21 +21,43 @@
 }
 
 .calendar table td {
-    padding: 15px;
     border: 1px solid #ddd;
     transition: background-color 0.3s;
+    width: calc(100% / 7);
+    height: 55px;
 }
 
-.calendar table td.weekday {
+.calendar table td .weekday {
     color: black;
 }
 
-.calendar table td.saturday {
+.calendar table td .saturday {
     color: blue;
 }
 
-.calendar table td.holiday {
+.calendar table td .holiday {
     color: red;
+}
+
+.calendar table td div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.calendar table td .day {
+    background-color: #f9f9f9;
+    height: 1rem;
+    font-size: 0.7rem;
+    opacity: 0.6;
+    font-weight: 600;
+}
+
+.calendar table td .nums {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
 }
 
 .calendar table tr:nth-child(odd) td {

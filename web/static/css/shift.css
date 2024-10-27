@@ -28,12 +28,6 @@
     height: 55px;
 }
 
-.calendar table div {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
 .calendar table th:first-child {
     color: red;
     border-bottom: 1px solid red;
@@ -54,6 +48,12 @@
 
 .calendar table td .holiday {
     color: red;
+}
+
+.calendar table td div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .calendar table td .day {
