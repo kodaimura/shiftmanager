@@ -1,11 +1,13 @@
 import { api } from '/js/api.js';
 
 let holidayCache = {};
+let displayNameMap = {};
 
 window.addEventListener("DOMContentLoaded", async () => {
     const year = parseInt(document.getElementById('year').value);
     const month = parseInt(document.getElementById('month').value); 
     await fetchHolidays(year, month);
+    await getDisplayNameMap();
     renderCalendar(year, month);
     renderModalCalendar(year, month);
     getShiftPreferred(year, month);
@@ -78,6 +80,13 @@ const renderCalendar = (year, month) => {
         div1.textContent = day;
         input.dataset.day = day;
         input.onchange = setCounter;
+
+        input.setAttribute('data-bs-toggle', 'tooltip');
+        input.setAttribute('aria-label', 'candidate');
+        input.setAttribute('title', '');
+        const tooltip = new bootstrap.Tooltip(input);
+        input.focus = () => tooltip.show();
+        input.blur = () => tooltip.hide();
 
         div2.appendChild(input);
         wrap.appendChild(div1);
@@ -185,9 +194,23 @@ const handleClickCell = (cell, day) => {
     form.elements['store_holiday'].value = storeHoliday.join(',');
 };
 
+const getDisplayNameMap = async () => {
+    try {
+        const result = await api.get('account_profiles');
+        for (let data of result) {
+            const accountId = data.account_id;
+            const displayName = data.display_name;
+            displayNameMap[accountId] = displayName;
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 const getShiftPreferred = async (year, month) => {
     try {
         const result = await api.get(`shift_preferreds?year=${year}&month=${month}`);
+        let candidate = new Array(31).fill([]);
         for (let data of result) {
             const dates = data.dates.split(',').map(Number);
             for (let date of dates) {
@@ -195,7 +218,15 @@ const getShiftPreferred = async (year, month) => {
                 if (cell) {
                     cell.textContent = (parseInt(cell.textContent) || 0) + 1;
                 }
+                candidate[date - 1] = [...candidate[date - 1], displayNameMap[data.account_id]];
             };
+        }
+        for (let i = 1; i <= 31; i++) {
+            const input = document.querySelector(`#calendar input[data-day='${i}']`);
+            if (input) {
+                input.setAttribute('title', candidate[i - 1].join(', '));
+                new bootstrap.Tooltip(input);
+            }
         }
     } catch (e) {
         console.error(e);
