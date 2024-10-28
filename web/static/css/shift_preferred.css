@@ -45,7 +45,7 @@
     height: 100%;
 }
 
-.calendar table td .day {
+.calendar table td .cell-day {
     background-color: #f9f9f9;
     height: 1rem;
     font-size: 0.7rem;
@@ -53,11 +53,10 @@
     font-weight: 600;
 }
 
-.calendar table td .nums {
+.calendar table td .cell-content {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-grow: 1;
 }
 
 .calendar table tr:nth-child(odd) td {
