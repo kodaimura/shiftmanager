@@ -1,87 +1,22 @@
 import { api } from '/js/api.js';
-
-let holidayCache = {};
+import { renderCalendar } from '/js/calendar.js';
 
 window.addEventListener("DOMContentLoaded", async () => {
     const year = parseInt(document.getElementById('year').value);
-    const month = parseInt(document.getElementById('month').value); 
-    await fetchHolidays(year, month);
-    renderCalendar(year, month);
+    const month = parseInt(document.getElementById('month').value);
+    await renderCalendar(year, month, document.querySelector('#calendar tbody'));
+    addEventsToCalendar();
     await getShiftPreferreds(year, month);
     await getShiftPreferred(year, month);
     document.getElementById("save").addEventListener("click", save);
 });
 
-const fetchHolidays = async (year, month) => {
-    const url = `https://api.national-holidays.jp/${year}${String(month).padStart(2, '0')}`;
-    try {
-        holidayCache[`${year}-${month}`] = [];
-        const response = await fetch(url);
-        if (response.ok) {
-            holidayCache[`${year}-${month}`] = await response.json();
+const addEventsToCalendar = () => {
+    for (let i = 1; i <= 31; i++) {
+        const cell = document.querySelector(`#calendar div[data-day='${i}']`);
+        if (cell) {
+            cell.addEventListener('click', () => handleClickCell(cell, i));
         }
-    } catch (error) {
-        console.error('Error fetching holidays:', error);
-    }
-};
-
-const isHoliday = (year, month, day) => {
-    if (!holidayCache[`${year}-${month}`]) {
-        console.error(`祝日データがロードされていません: ${year}-${month}`);
-        return false;
-    }
-    return holidayCache[`${year}-${month}`].some((holiday) => {
-        return holiday.date === `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    });
-};
-
-const renderCalendar = (year, month) => {
-    const calendarBody = document.querySelector('#calendar tbody');
-    calendarBody.innerHTML = '';
-
-    const firstDay = new Date(year, month - 1, 1);
-    const lastDay = new Date(year, month, 0);
-
-    let row = document.createElement('tr');
-    for (let i = 0; i < firstDay.getDay(); i++) {
-        row.appendChild(document.createElement('td'));
-    }
-
-    for (let day = 1; day <= lastDay.getDate(); day++) {
-        const cell = document.createElement('td');
-        const wrap = document.createElement('div');
-        const div1 = document.createElement('div');
-        const div2 = document.createElement('div');
-        div1.classList.add('day');
-        div2.classList.add('nums');
-
-        const dayOfWeek = new Date(year, month - 1, day).getDay();
-        if (dayOfWeek === 0 || isHoliday(year, month, day)) {
-            cell.classList.add('holiday');
-        } else if (dayOfWeek === 6) {
-            cell.classList.add('saturday');
-        } else {
-            cell.classList.add('weekday');
-        }
-
-        cell.dataset.day = day;
-        div1.textContent = day;
-        div2.dataset.day = day;
-        cell.addEventListener('click', () => handleClickCell(cell, day));
-
-        wrap.appendChild(div1);
-        wrap.appendChild(div2);
-        cell.appendChild(wrap);
-
-        row.appendChild(cell);
-        if ((firstDay.getDay() + day) % 7 === 0) {
-            calendarBody.appendChild(row);
-            row = document.createElement('tr');
-        }
-    }
-
-    if (row.children.length > 0) {
-        calendarBody.appendChild(row);
     }
 };
 

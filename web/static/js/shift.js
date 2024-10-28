@@ -1,15 +1,15 @@
 import { api } from '/js/api.js';
+import { renderCalendar } from '/js/calendar.js';
 
-let holidayCache = {};
 let displayNameMap = {};
 
 window.addEventListener("DOMContentLoaded", async () => {
     const year = parseInt(document.getElementById('year').value);
     const month = parseInt(document.getElementById('month').value); 
-    await fetchHolidays(year, month);
+
+    await renderCalendarCustom(year, month);
+    await renderModalCalendar(year, month);
     await getDisplayNameMap();
-    renderCalendar(year, month);
-    renderModalCalendar(year, month);
     getShiftPreferred(year, month);
     getShift(year, month);
 
@@ -25,162 +25,39 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
 });
 
-const fetchHolidays = async (year, month) => {
-    const url = `https://api.national-holidays.jp/${year}${String(month).padStart(2, '0')}`;
-    try {
-        holidayCache[`${year}-${month}`] = [];
-        const response = await fetch(url);
-        if (response.ok) {
-            holidayCache[`${year}-${month}`] = await response.json();
+const renderCalendarCustom = async (year, month) => {
+    await renderCalendar(year, month, document.querySelector('#calendar tbody'));
+
+    for (let i = 1; i <= 31; i++) {
+        const cell = document.querySelector(`#calendar .cell-body[data-day='${i}']`);
+        if (cell) {
+            const input = document.createElement('input');
+            input.dataset.day = i;
+            input.onchange = setCounter;
+
+            input.setAttribute('data-bs-toggle', 'tooltip');
+            input.setAttribute('aria-label', 'candidate');
+            input.setAttribute('title', '');
+            const tooltip = new bootstrap.Tooltip(input);
+            input.focus = () => tooltip.show();
+            input.blur = () => tooltip.hide();
+            input.oninput = () => {
+                input.value = input.value.replace(/　/g, ' ');
+            };
+
+            cell.appendChild(input);
         }
-    } catch (error) {
-        console.error('Error fetching holidays:', error);
     }
 };
 
-const isHoliday = (year, month, day) => {
-    if (!holidayCache[`${year}-${month}`]) {
-        console.error(`祝日データがロードされていません: ${year}-${month}`);
-        return false;
-    }
-    return holidayCache[`${year}-${month}`].some((holiday) => {
-        return holiday.date === `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    });
-};
+const renderModalCalendar = async (year, month) => {
+    await renderCalendar(year, month, document.querySelector('#modal-calendar tbody'));
 
-const renderCalendar = (year, month) => {
-    const calendarBody = document.querySelector('#calendar tbody');
-    calendarBody.innerHTML = '';
-
-    const firstDay = new Date(year, month - 1, 1);
-    const lastDay = new Date(year, month, 0);
-
-    let row = document.createElement('tr');
-    for (let i = 0; i < firstDay.getDay(); i++) {
-        row.appendChild(document.createElement('td'));
-    }
-
-    for (let day = 1; day <= lastDay.getDate(); day++) {
-        const cell = document.createElement('td');
-        const wrap = document.createElement('div');
-        const div1 = document.createElement('div');
-        const div2 = document.createElement('div');
-        const input = document.createElement('input');
-        div1.classList.add('day');
-        div2.classList.add('names');
-
-        const dayOfWeek = new Date(year, month - 1, day).getDay();
-        if (dayOfWeek === 0 || isHoliday(year, month, day)) {
-            div1.classList.add('holiday');
-        } else if (dayOfWeek === 6) {
-            div1.classList.add('saturday');
-        } else {
-            div1.classList.add('weekday');
+    for (let i = 1; i <= 31; i++) {
+        const cell = document.querySelector(`#modal-calendar td[data-day='${i}']`);
+        if (cell) {
+            cell.addEventListener('click', () => handleClickCell(cell, i));
         }
-        div1.textContent = day;
-        input.dataset.day = day;
-        input.onchange = setCounter;
-
-        input.setAttribute('data-bs-toggle', 'tooltip');
-        input.setAttribute('aria-label', 'candidate');
-        input.setAttribute('title', '');
-        const tooltip = new bootstrap.Tooltip(input);
-        input.focus = () => tooltip.show();
-        input.blur = () => tooltip.hide();
-        input.oninput = () => {
-            input.value = input.value.replace(/　/g, ' ');
-        };
-
-        div2.appendChild(input);
-        wrap.appendChild(div1);
-        wrap.appendChild(div2);
-        cell.appendChild(wrap);
-
-        row.appendChild(cell);
-        if ((firstDay.getDay() + day) % 7 === 0) {
-            calendarBody.appendChild(row);
-            row = document.createElement('tr');
-        }
-    }
-
-    if (row.children.length > 0) {
-        calendarBody.appendChild(row);
-    }
-};
-
-const getShift = async (year, month) => {
-    try {
-        const result = await api.get(`shifts/${year}/${month}`);
-        const shift = result.shift_data ? result.shift_data.split(',') : [];
-        for (let i = 1; i <= 31; i++) {
-            const input = document.querySelector(`#calendar input[data-day='${i}']`);
-            if (input) {
-                input.value = shift[i - 1];
-            }
-        };
-
-        const form = document.getElementById('generate-form');
-        form.elements['store_holiday'].value = result.store_holiday;
-
-        const storeHoliday = result.store_holiday.split(',').filter(item => item !== '');
-        for (let i = 1; i <= 31; i++) {
-            const cell = document.querySelector(`#modal-calendar tbody div[data-day='${i}']`);
-            if (storeHoliday.includes(String(i))) {
-                cell.style.backgroundColor = 'gray';
-            }
-        };
-
-        setCounter();
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-const renderModalCalendar = (year, month) => {
-    const calendarBody = document.querySelector('#modal-calendar tbody');
-    calendarBody.innerHTML = '';
-
-    const firstDay = new Date(year, month - 1, 1);
-    const lastDay = new Date(year, month, 0);
-
-    let row = document.createElement('tr');
-    for (let i = 0; i < firstDay.getDay(); i++) {
-        row.appendChild(document.createElement('td'));
-    }
-
-    for (let day = 1; day <= lastDay.getDate(); day++) {
-        const cell = document.createElement('td');
-        const wrap = document.createElement('div');
-        const div1 = document.createElement('div');
-        const div2 = document.createElement('div');
-        div1.classList.add('day');
-        div2.classList.add('names');
-
-        const dayOfWeek = new Date(year, month - 1, day).getDay();
-        if (dayOfWeek === 0 || isHoliday(year, month, day)) {
-            div1.classList.add('holiday');
-        } else if (dayOfWeek === 6) {
-            div1.classList.add('saturday');
-        } else {
-            div1.classList.add('weekday');
-        }
-        div1.textContent = day;
-        div2.dataset.day = day;
-        div2.addEventListener('click', () => handleClickCell(div2, day));
-
-        wrap.appendChild(div1);
-        wrap.appendChild(div2);
-        cell.appendChild(wrap);
-
-        row.appendChild(cell);
-        if ((firstDay.getDay() + day) % 7 === 0) {
-            calendarBody.appendChild(row);
-            row = document.createElement('tr');
-        }
-    }
-
-    if (row.children.length > 0) {
-        calendarBody.appendChild(row);
     }
 };
 
@@ -196,6 +73,36 @@ const handleClickCell = (cell, day) => {
     }
     form.elements['store_holiday'].value = storeHoliday.join(',');
 };
+
+const getShift = async (year, month) => {
+    try {
+        const result = await api.get(`shifts/${year}/${month}`);
+        if (result.shift_data) {
+            const ls = result.shift_data.split(',');
+            for (let i = 1; i <= 31; i++) {
+                const input = document.querySelector(`#calendar input[data-day='${i}']`);
+                if (input) {
+                    input.value = ls[i - 1];
+                }
+            };
+        }
+        if (result.store_holiday) {
+            const form = document.getElementById('generate-form');
+            form.elements['store_holiday'].value = result.store_holiday;
+
+            const ls = result.store_holiday.split(',').filter(item => item !== '');
+            for (let i = 1; i <= 31; i++) {
+                const cell = document.querySelector(`#modal-calendar td[data-day='${i}']`);
+                if (ls.includes(String(i))) {
+                    cell.style.backgroundColor = 'gray';
+                }
+            };
+        }
+        setCounter();
+    } catch (e) {
+        console.error(e);
+    }
+}
 
 const getDisplayNameMap = async () => {
     try {
@@ -217,7 +124,7 @@ const getShiftPreferred = async (year, month) => {
         for (let data of result) {
             const dates = data.dates.split(',').map(Number);
             for (let date of dates) {
-                const cell = document.querySelector(`#modal-calendar div[data-day='${date}']`);
+                const cell = document.querySelector(`#modal-calendar .cell-body[data-day='${date}']`);
                 if (cell) {
                     cell.textContent = (parseInt(cell.textContent) || 0) + 1;
                 }
@@ -279,9 +186,9 @@ const save = async () => {
         store_holiday: form.elements['store_holiday'].value,
     };
     try {
-       await api.post(`shifts/${year}/${month}`, body);
-       alert('保存しました。')
-       getShift(year, month);
+        await api.post(`shifts/${year}/${month}`, body);
+        alert('保存しました。')
+        getShift(year, month);
     } catch (e) {
         alert('保存に失敗しました。')
         console.error(e);
@@ -304,7 +211,7 @@ const setCounter = () => {
         }
     };
 
-    let str = '';
+    let str = ' ';
     for (const x in countMap) {
         str += `${x}:${countMap[x]}  `;
     }
