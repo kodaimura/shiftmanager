@@ -53,10 +53,11 @@
     font-weight: 600;
 }
 
-.calendar table td .cell-content {
+.calendar table td .cell-body {
     display: flex;
     justify-content: center;
     align-items: center;
+    opacity: 0.4;
 }
 
 .calendar table tr:nth-child(odd) td {

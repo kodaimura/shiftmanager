@@ -77,25 +77,27 @@ const handleClickCell = (cell, day) => {
 const getShift = async (year, month) => {
     try {
         const result = await api.get(`shifts/${year}/${month}`);
-        const shift = result.shift_data ? result.shift_data.split(',') : [];
-        for (let i = 1; i <= 31; i++) {
-            const input = document.querySelector(`#calendar input[data-day='${i}']`);
-            if (input) {
-                input.value = shift[i - 1];
-            }
-        };
+        if (result.shift_data) {
+            const ls = result.shift_data.split(',');
+            for (let i = 1; i <= 31; i++) {
+                const input = document.querySelector(`#calendar input[data-day='${i}']`);
+                if (input) {
+                    input.value = ls[i - 1];
+                }
+            };
+        }
+        if (result.store_holiday) {
+            const form = document.getElementById('generate-form');
+            form.elements['store_holiday'].value = result.store_holiday;
 
-        const form = document.getElementById('generate-form');
-        form.elements['store_holiday'].value = result.store_holiday;
-
-        const storeHoliday = result.store_holiday.split(',').filter(item => item !== '');
-        for (let i = 1; i <= 31; i++) {
-            const cell = document.querySelector(`#modal-calendar td[data-day='${i}']`);
-            if (storeHoliday.includes(String(i))) {
-                cell.style.backgroundColor = 'gray';
-            }
-        };
-
+            const ls = result.store_holiday.split(',').filter(item => item !== '');
+            for (let i = 1; i <= 31; i++) {
+                const cell = document.querySelector(`#modal-calendar td[data-day='${i}']`);
+                if (ls.includes(String(i))) {
+                    cell.style.backgroundColor = 'gray';
+                }
+            };
+        }
         setCounter();
     } catch (e) {
         console.error(e);
@@ -184,9 +186,9 @@ const save = async () => {
         store_holiday: form.elements['store_holiday'].value,
     };
     try {
-       await api.post(`shifts/${year}/${month}`, body);
-       alert('保存しました。')
-       getShift(year, month);
+        await api.post(`shifts/${year}/${month}`, body);
+        alert('保存しました。')
+        getShift(year, month);
     } catch (e) {
         alert('保存に失敗しました。')
         console.error(e);
@@ -209,7 +211,7 @@ const setCounter = () => {
         }
     };
 
-    let str = '';
+    let str = ' ';
     for (const x in countMap) {
         str += `${x}:${countMap[x]}  `;
     }
