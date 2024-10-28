@@ -47,7 +47,7 @@
     color: red;
 }
 
-.calendar table td .day {
+.calendar table td .cell-day {
     background-color: #f9f9f9;
     height: 1rem;
     font-size: 0.7rem;
@@ -55,7 +55,7 @@
     font-weight: 600;
 }
 
-.calendar table td .names {
+.calendar table td .cell-body {
     padding-bottom: 3px;
     font-size: 0.75rem;
     flex-grow: 1;
