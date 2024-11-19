@@ -40,7 +40,7 @@ func SetApiRouter(r *gin.RouterGroup) {
 	spc := controller.NewShiftPreferredController()
 	sc := controller.NewShiftController()
 
-	r.POST("/signup", ac.ApiSignup)
+	r.POST("/signup", middleware.BasicAuthMiddleware(), ac.ApiSignup)
 	r.POST("/login", ac.ApiLogin)
 
 	auth := r.Group("", middleware.JwtAuthApiMiddleware())
