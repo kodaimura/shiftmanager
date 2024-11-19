@@ -17,6 +17,7 @@ type ShiftGenerator struct {
 	holidays      []int
 	dailyPreferreds *[31][]int
 	profileMap    map[int]model.AccountProfile
+	memberCount   int
 }
 
 func NewShiftGenerator(year, month int, holidays []int) *ShiftGenerator {
@@ -25,6 +26,7 @@ func NewShiftGenerator(year, month int, holidays []int) *ShiftGenerator {
 		month:  month,
 		holidays: holidays,
 		profileMap: make(map[int]model.AccountProfile),
+		memberCount: 0,
 	}
 }
 
@@ -93,7 +95,7 @@ func (gen *ShiftGenerator) GenerateCsvShift() (string, error) {
 	tmpScore := 0
 	score := 0
 
-	for i := 0; i < 700000; i++ {
+	for i := 0; i < 1500000; i++ {
 		tmpShift = gen.makeTmpShift()
 		tmpScore = gen.evaluateShift(tmpShift)
 		if score < tmpScore {
@@ -137,26 +139,34 @@ func (gen *ShiftGenerator) evaluateUniformity(shift *[31][]int) int {
 			counts[x]++
 		}
 	}
-
+	count := len(counts)
+	if count < gen.memberCount {
+		return 0
+	}
+	if count > gen.memberCount {
+		gen.memberCount = count
+	}
+	if gen.allCountEqual(counts) {
+		return 105
+	}
+	minmaxDiff := gen.minmaxDifference(counts)
 	total := 0.0
 	for _, num := range counts {
 		total += float64(num)
 	}
 
 	mean := total / float64(len(counts))
-
 	var varianceSum float64
 	for _, num := range counts {
-		varianceSum += math.Pow(float64(num)-mean, 2)
+		varianceSum += math.Pow(float64(num) - mean, 2)
 	}
 
 	variance := varianceSum / float64(len(counts))
 	stdDev := math.Sqrt(variance)
-
 	if stdDev == 0 {
-		return 100
+		return 100 - minmaxDiff * 2
 	}
-	return int(math.Min((1/stdDev)*100, 100))
+	return int(math.Min((1 / stdDev) * 100, 100)) - minmaxDiff * 2
 }
 
 func (gen *ShiftGenerator) evaluateRolePenalty(shift *[31][]int) int {
@@ -165,14 +175,48 @@ func (gen *ShiftGenerator) evaluateRolePenalty(shift *[31][]int) int {
 		if len(shift[i]) < 2 {
 			continue
 		}
-		if gen.profileMap[shift[i][0]].AccountRole == "1" && gen.profileMap[shift[i][1]].AccountRole == "1" {
-			penalty += 1
-		}
-		if gen.profileMap[shift[i][0]].AccountRole == "2" && gen.profileMap[shift[i][1]].AccountRole == "2" {
-			penalty += 2
+		if gen.profileMap[shift[i][0]].AccountRole == gen.profileMap[shift[i][1]].AccountRole {
+			if gen.profileMap[shift[i][0]].AccountRole != "3" {
+				penalty += 2
+			}
 		}
 	}
 	return penalty
+}
+
+func (gen *ShiftGenerator) allCountEqual(m map[int]int) bool {
+	var firstValue int
+	isFirst := true
+
+	for _, value := range m {
+		if isFirst {
+			firstValue = value
+			isFirst = false
+		} else if value != firstValue {
+			return false
+		}
+	}
+	return true
+}
+
+func (gen *ShiftGenerator) minmaxDifference(m map[int]int) int {
+	var maxVal, minVal int
+	first := true
+
+	for _, value := range m {
+		if first {
+			maxVal, minVal = value, value
+			first = false
+		} else {
+			if value > maxVal {
+				maxVal = value
+			}
+			if value < minVal {
+				minVal = value
+			}
+		}
+	}
+	return maxVal - minVal
 }
 
 func (gen *ShiftGenerator) toCsvShift(shift *[31][]int) string {
