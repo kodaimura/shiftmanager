@@ -13,7 +13,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 const addEventsToCalendar = () => {
     for (let i = 1; i <= 31; i++) {
-        const cell = document.querySelector(`#calendar div[data-day='${i}']`);
+        const cell = document.querySelector(`#calendar tbody td[data-day='${i}']`);
         if (cell) {
             cell.addEventListener('click', () => handleClickCell(cell, i));
         }
