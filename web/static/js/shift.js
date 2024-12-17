@@ -122,6 +122,7 @@ const getShiftPreferred = async (year, month) => {
         const result = await api.get(`shift_preferreds?year=${year}&month=${month}`);
         let candidate = new Array(31).fill([]);
         for (let data of result) {
+            if (data.dates === '') continue;
             const dates = data.dates.split(',').map(Number);
             for (let date of dates) {
                 const cell = document.querySelector(`#modal-calendar .cell-body[data-day='${date}']`);
