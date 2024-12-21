@@ -93,7 +93,7 @@ func (gen *ShiftGenerator) GenerateCsvShift() (string, error) {
 	shift := new([31][]int)
 	tmpShift := new([31][]int)
 	tmpScore := 0
-	score := 0
+	score := -100
 
 	for i := 0; i < 1500000; i++ {
 		tmpShift = gen.makeTmpShift()
@@ -141,7 +141,7 @@ func (gen *ShiftGenerator) evaluateUniformity(shift *[31][]int) int {
 	}
 	count := len(counts)
 	if count < gen.memberCount {
-		return 0
+		return -100
 	}
 	if count > gen.memberCount {
 		gen.memberCount = count
