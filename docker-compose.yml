@@ -10,4 +10,4 @@ services:
     tty: true
     environment:
       - ENV=local
-    command: sh -c "go mod tidy && go run cmd/shiftmanager/main.go"
+    command: sh -c "go run cmd/shiftmanager/main.go"

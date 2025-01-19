@@ -8,5 +8,5 @@ services:
       - .:/usr/src/app
     working_dir: /usr/src/app
     tty: true
-    command: sh -c "go mod tidy && go build cmd/shiftmanager/main.go && ./main"
+    command: sh -c "go build cmd/shiftmanager/main.go && ./main"
     restart: always
