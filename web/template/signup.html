@@ -1,37 +1,40 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-{{template "head" .}}
+  {{template "head" .}}
 </head>
+
 <body>
-{{template "header" .}}
+  {{template "header_guest" .}}
 
-<main class="container">
-	<a href="login">ログイン</a>
-	<div class="row justify-content-center">
-		<h2 class="text-center">アカウント作成</h2>
-		<div class="col-md-6">
-			<div class="text-danger" id="error"></div>
-			<form onsubmit="return false;" id="signup-form">
-				<div class="input-group mb-3">
-					<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-					<input type="text" name="account_name" class="form-control" placeholder="ログインID">
-				</div>
-				<div class="input-group mb-3">
-					<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-					<input type="password" name="account_password" class="form-control" placeholder="パスワード">
-				</div>
-				<div class="input-group mb-3">
-					<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-					<input type="password" name="account_password_confirm" class="form-control" placeholder="パスワード（再）">
-				</div>
-				<button class="btn btn-success w-100" id="signup">サインアップ</button>
-			</form>
-		</div>
-	</div>
-</main>
+  <main class="container">
+    <a href="login">ログイン</a>
+    <div class="row justify-content-center">
+      <h2 class="text-center">アカウント作成</h2>
+      <div class="col-md-6">
+        <div class="text-danger" id="error"></div>
+        <form onsubmit="return false;" id="signup-form">
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+            <input type="text" name="account_name" class="form-control" placeholder="ログインID">
+          </div>
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+            <input type="password" name="account_password" class="form-control" placeholder="パスワード">
+          </div>
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+            <input type="password" name="account_password_confirm" class="form-control" placeholder="パスワード（再）">
+          </div>
+          <button class="btn btn-success w-100" id="signup">アカウント登録</button>
+        </form>
+      </div>
+    </div>
+  </main>
 
-{{template "footer" .}}
-<script type="module" src="/js/signup.js"></script>
+  {{template "footer" .}}
+  <script type="module" src="/js/signup.js"></script>
 </body>
+
 </html>
