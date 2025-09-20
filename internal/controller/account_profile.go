@@ -5,9 +5,9 @@ import (
 
 	"shiftmanager/internal/core/jwt"
 	"shiftmanager/internal/core/utils"
-	"shiftmanager/internal/service"
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/request"
+	"shiftmanager/internal/service"
 )
 
 type AccountProfileController struct {
@@ -22,7 +22,11 @@ func NewAccountProfileController() *AccountProfileController {
 
 // GET /account_profiles/me
 func (ctr *AccountProfileController) AccountProfilePage(c *gin.Context) {
-	c.HTML(200, "account_profile.html", gin.H{})
+	pl := jwt.GetPayload(c)
+
+	c.HTML(200, "account_profile.html", gin.H{
+		"account_name": pl.AccountName,
+	})
 }
 
 // GET /api/account_profiles/me
