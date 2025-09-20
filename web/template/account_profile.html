@@ -2,42 +2,88 @@
 <html>
 
 <head>
-{{template "head" .}}
+  {{template "head" .}}
 </head>
 
 <body>
-{{template "header" .}}
-<main class="container">
-<h1 class="h4 fw-bold">プロフ登録</h1>
-<form onsubmit="return false" id="profile-form">
-    <div class="row">
-        <div class="col-sm">
-            <div>
-                <label for="display_name" class="form-label">表示名</label>
-                <input type="text" class="form-control form-control" name="display_name" maxlength="1" required>
-                <div class="form-text">イニシャル等。1文字。他と被らないように。</div>
+  {{template "header" .}}
+
+  <main class="container">
+    <!-- プロフ登録 -->
+    <section class="my-4">
+      <h2 class="h4 fw-bold text-center mb-3">プロフ登録</h2>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="text-danger" id="profile-error"></div>
+          <form onsubmit="return false" id="profile-form">
+            <div class="mb-3">
+              <label for="display_name" class="form-label">表示名</label>
+              <input type="text" class="form-control" name="display_name" maxlength="1" required>
+              <div class="form-text">イニシャル等。1文字。他と被らないように。</div>
             </div>
-        </div>
-        <div class="col-sm">
-            <div>
-                <label for="account_role" class="form-label">役割</label>
-                <select class="form-select form-select" name="account_role" required>
-                    <option value="1">キッチン</option>
-                    <option value="2">ホール</option>
-                    <option value="3">キッチン・ホール</option>
-                </select>
-                <div class="form-text">新人さんは教わった方を選択して下さい。</div>
+
+            <div class="mb-3">
+              <label for="account_role" class="form-label">役割</label>
+              <select class="form-select" name="account_role" required>
+                <option value="1">キッチン</option>
+                <option value="2">ホール</option>
+                <option value="3">キッチン・ホール</option>
+              </select>
+              <div class="form-text">新人さんは教わった方を選択して下さい。</div>
             </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <button class="btn btn-primary" id="profile-button">登録する</button>
+              <a href="/" class="btn btn-outline-secondary">ホームに戻る</a>
+            </div>
+          </form>
         </div>
-    </div>
-</form>
-<div class="d-flex justify-content-between mt-3">
-    <button class="btn btn-primary btn-md" id="save">登録する</button>
-    <a href="/" class="btn btn-outline-secondary" role="button">ホームに戻る</a>
-</div>
-</main>
-{{template "footer"}}
-<script type="module" src="/js/account_profile.js"></script>
+      </div>
+    </section>
+    <hr>
+
+    <!-- パスワード変更 -->
+    <section class="mt-5">
+      <h2 class="h4 fw-bold text-center mb-3">ログイン情報変更</h2>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="text-danger" id="password-error"></div>
+          <form onsubmit="return false;" id="password-form">
+            <div style="font-size: 0.8rem;padding-left: 40px;">※ログインIDを変更したい場合は管理者にお知らせください。</div>
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+              <input type="text" name="account_name" class="form-control" disabled value="{{.account_name}}">
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+              <input type="password" name="account_password_current" class="form-control" placeholder="現在のパスワード"
+                required>
+            </div>
+
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+              <input type="password" name="account_password" class="form-control" placeholder="新しいパスワード" required>
+            </div>
+
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+              <input type="password" name="account_password_confirm" class="form-control" placeholder="新しいパスワード（確認用）"
+                required>
+            </div>
+
+            <button class="btn btn-success w-100" id="password-button">変更する</button>
+          </form>
+          <div class="d-flex mt-4 justify-content-end">
+            <a href="/" class="btn btn-outline-secondary">ホームに戻る</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {{template "footer"}}
+  <script type="module" src="/js/account_profile.js?v=1.0.4"></script>
+  <script type="module" src="/js/account_password.js?v=1.0.4"></script>
 </body>
 
 </html>
