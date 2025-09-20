@@ -1,83 +1,83 @@
 .calendar {
-    margin: auto;
-    background-color: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+  margin: auto;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .calendar table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-    color: #333;
-    table-layout: fixed
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  color: #333;
+  table-layout: fixed
 }
 
 .calendar table th {
-    padding: 8px; 
-    background-color: #ededed;
-    font-weight: bold;
-    border: 1px solid #bbb;
-    border-bottom: 1px solid #555;
+  padding: 8px;
+  background-color: #ededed;
+  font-weight: bold;
+  border: 1px solid #bbb;
+  border-bottom: 1px solid #555;
 }
 
 .calendar table td {
-    border: 1px solid #ddd;
-    transition: background-color 0.3s;
-    width: calc(100% / 7);
-    height: 55px;
+  border: 1px solid #ddd;
+  transition: background-color 0.3s;
+  width: calc(100% / 7);
+  height: 55px;
 }
 
 .calendar table th:first-child {
-    color: red;
-    border-bottom: 1px solid red;
+  color: red;
+  border-bottom: 1px solid red;
 }
 
 .calendar table th:last-child {
-    color: blue;
-    border-bottom: 1px solid blue;
+  color: blue;
+  border-bottom: 1px solid blue;
 }
 
 .calendar table td .weekday {
-    color: black;
+  color: black;
 }
 
 .calendar table td .saturday {
-    color: blue;
+  color: blue;
 }
 
 .calendar table td .holiday {
-    color: red;
+  color: red;
 }
 
 .calendar table td div {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .calendar table td .cell-day {
-    background-color: #f9f9f9;
-    height: 1rem;
-    font-size: 0.7rem;
-    opacity: 0.6;
-    font-weight: 600;
+  background-color: #f9f9f9;
+  height: 1rem;
+  font-size: 0.7rem;
+  opacity: 0.6;
+  font-weight: 600;
 }
 
 .calendar table td .cell-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
 }
 
 .calendar table td .cell-body input {
-    border: 0;
-    width: 95%;
-    font-size: 0.8rem;
-    text-align: center;
+  border: 0;
+  width: 95%;
+  font-size: 0.8rem;
+  text-align: center;
 }
 
 #modal-calendar table td .cell-body {
-    opacity: 0.4;
+  opacity: 0.4;
 }
