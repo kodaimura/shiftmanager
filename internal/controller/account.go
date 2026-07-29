@@ -3,12 +3,12 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 
-	"shiftmanager/internal/core/jwt"
 	"shiftmanager/internal/core/errs"
+	"shiftmanager/internal/core/jwt"
 	"shiftmanager/internal/core/utils"
-	"shiftmanager/internal/service"
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/request"
+	"shiftmanager/internal/service"
 )
 
 type AccountController struct {
@@ -33,7 +33,7 @@ func (ctr *AccountController) LoginPage(c *gin.Context) {
 
 // GET /logout
 func (ctr *AccountController) Logout(c *gin.Context) {
-	jwt.RemoveTokenFromCookie(c)
+	jwt.RemoveRefreshTokenFromCookie(c)
 	c.Redirect(303, "/login")
 }
 
@@ -78,14 +78,53 @@ func (ctr *AccountController) ApiLogin(c *gin.Context) {
 		return
 	}
 
-	pl, err := ctr.accountService.GenerateJwtPayload(dto.AccountPK{Id: account.Id})
+	accessPayload, err := ctr.accountService.GenerateAccessPayload(dto.AccountPK{Id: account.Id})
 	if err != nil {
 		JsonError(c, 500, "ログインに失敗しました。")
 		return
 	}
 
-	jwt.SetTokenToCookie(c, pl)
-	c.JSON(200, gin.H{})
+	refreshPayload, err := ctr.accountService.GenerateRefreshPayload(dto.AccountPK{Id: account.Id})
+	if err != nil {
+		JsonError(c, 500, "ログインに失敗しました。")
+		return
+	}
+
+	if err := jwt.SetRefreshTokenToCookie(c, refreshPayload); err != nil {
+		JsonError(c, 500, "ログインに失敗しました。")
+		return
+	}
+
+	accessToken, err := jwt.EncodeJwt(accessPayload)
+	if err != nil {
+		JsonError(c, 500, "ログインに失敗しました。")
+		return
+	}
+
+	c.JSON(200, gin.H{"access_token": accessToken})
+}
+
+// POST /api/refresh
+func (ctr *AccountController) ApiRefresh(c *gin.Context) {
+	if err := jwt.AuthRefreshToken(c); err != nil {
+		JsonError(c, 401, "ログイン状態が無効です。")
+		return
+	}
+
+	pl := jwt.GetPayload(c)
+	accessPayload, err := ctr.accountService.GenerateAccessPayload(dto.AccountPK{Id: pl.AccountId})
+	if err != nil {
+		JsonError(c, 401, "ログイン状態が無効です。")
+		return
+	}
+
+	accessToken, err := jwt.EncodeJwt(accessPayload)
+	if err != nil {
+		JsonError(c, 500, "トークンの更新に失敗しました。")
+		return
+	}
+
+	c.JSON(200, gin.H{"access_token": accessToken})
 }
 
 // GET /api/accounts/me

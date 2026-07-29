@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"golang.org/x/crypto/bcrypt"
 
+	"shiftmanager/internal/core/errs"
 	"shiftmanager/internal/core/jwt"
 	"shiftmanager/internal/core/logger"
-	"shiftmanager/internal/core/errs"
 	"shiftmanager/internal/core/utils"
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/model"
@@ -20,7 +20,8 @@ type AccountService interface {
 	UpdatePassword(input dto.UpdateAccountPassword) error
 	Login(input dto.Login) (dto.Account, error)
 	Signup(input dto.Signup) (dto.AccountPK, error)
-	GenerateJwtPayload(input dto.AccountPK) (jwt.Payload, error)
+	GenerateAccessPayload(input dto.AccountPK) (jwt.Payload, error)
+	GenerateRefreshPayload(input dto.AccountPK) (jwt.Payload, error)
 }
 
 type accountService struct {
@@ -128,7 +129,7 @@ func (srv *accountService) Signup(input dto.Signup) (dto.AccountPK, error) {
 	return dto.AccountPK{Id: id}, nil
 }
 
-func (srv *accountService) GenerateJwtPayload(input dto.AccountPK) (jwt.Payload, error) {
+func (srv *accountService) GenerateAccessPayload(input dto.AccountPK) (jwt.Payload, error) {
 	account, err := srv.getAccountByID(input.Id)
 	if err != nil {
 		return jwt.Payload{}, err
@@ -137,8 +138,23 @@ func (srv *accountService) GenerateJwtPayload(input dto.AccountPK) (jwt.Payload,
 	cc := jwt.CustomClaims{
 		AccountId:   account.Id,
 		AccountName: account.Name,
+		TokenType:   jwt.TOKEN_TYPE_ACCESS,
 	}
-	return jwt.NewPayload(cc), nil
+	return jwt.NewPayload(cc, jwt.ACCESS_TOKEN_EXPIRES), nil
+}
+
+func (srv *accountService) GenerateRefreshPayload(input dto.AccountPK) (jwt.Payload, error) {
+	account, err := srv.getAccountByID(input.Id)
+	if err != nil {
+		return jwt.Payload{}, err
+	}
+
+	cc := jwt.CustomClaims{
+		AccountId:   account.Id,
+		AccountName: account.Name,
+		TokenType:   jwt.TOKEN_TYPE_REFRESH,
+	}
+	return jwt.NewPayload(cc, jwt.REFRESH_TOKEN_EXPIRES), nil
 }
 
 func (srv *accountService) checkUniqueName(id int, name string) error {

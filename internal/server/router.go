@@ -3,12 +3,12 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 
-	"shiftmanager/internal/middleware"
 	"shiftmanager/internal/controller"
+	"shiftmanager/internal/middleware"
 )
 
 /*
- Routing for "/" 
+Routing for "/"
 */
 func SetWebRouter(r *gin.RouterGroup) {
 	ic := controller.NewIndexController()
@@ -30,9 +30,8 @@ func SetWebRouter(r *gin.RouterGroup) {
 	}
 }
 
-
 /*
- Routing for "/api"
+Routing for "/api"
 */
 func SetApiRouter(r *gin.RouterGroup) {
 	ac := controller.NewAccountController()
@@ -42,6 +41,7 @@ func SetApiRouter(r *gin.RouterGroup) {
 
 	r.POST("/signup", middleware.BasicAuthMiddleware(), ac.ApiSignup)
 	r.POST("/login", ac.ApiLogin)
+	r.POST("/refresh", ac.ApiRefresh)
 
 	auth := r.Group("", middleware.JwtAuthApiMiddleware())
 	{

@@ -2,10 +2,9 @@ package jwt
 
 import (
 	"time"
-	
+
 	jwtpackage "github.com/golang-jwt/jwt/v4"
 )
-
 
 type Payload struct {
 	jwtpackage.StandardClaims
@@ -13,18 +12,18 @@ type Payload struct {
 }
 
 type CustomClaims struct {
-	AccountId int
+	AccountId   int
 	AccountName string
+	TokenType   string
 	/* 独自のフィールドを追加可能 */
 }
 
-
-func NewPayload(claims CustomClaims) Payload {
+func NewPayload(claims CustomClaims, expires time.Duration) Payload {
 	var pl Payload
 
 	pl.CustomClaims = claims
-	pl.IssuedAt =  time.Now().Unix()
-	pl.ExpiresAt = time.Now().Add(time.Second * JWT_EXPIRES).Unix()
+	pl.IssuedAt = time.Now().Unix()
+	pl.ExpiresAt = time.Now().Add(time.Second * expires).Unix()
 
 	return pl
 }

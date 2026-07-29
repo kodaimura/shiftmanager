@@ -1,4 +1,6 @@
 const BASE_URL = '/api';
+let accessToken = null;
+let refreshPromise = null;
 
 
 class HttpError extends Error {
@@ -17,17 +19,25 @@ class Api {
     this.#url = url;
   }
 
-  apiFetch = async (endpoint, method, body) => {
+  apiFetch = async (endpoint, method, body, retry = true) => {
     if (endpoint.startsWith('/')) {
       endpoint = endpoint.slice(1);
     }
     try {
+      if (this.#needsAccessToken(endpoint)) {
+        await this.refreshAccessTokenIfNeeded();
+      }
+
       let header = {
         method: method,
         headers: {
           'Content-Type': 'application/json',
         },
       };
+
+      if (accessToken && this.#needsAccessToken(endpoint)) {
+        header.headers['X-Access-Token'] = accessToken;
+      }
 
       if (body) {
         header.body = JSON.stringify(body);
@@ -36,6 +46,11 @@ class Api {
 
       if (!response.ok) {
         const errorData = await response.json();
+        if (response.status === 401 && retry && this.#needsAccessToken(endpoint)) {
+          accessToken = null;
+          await this.refreshAccessTokenIfNeeded();
+          return this.apiFetch(endpoint, method, body, false);
+        }
         throw new HttpError(response.status, errorData.error);
       }
 
@@ -56,6 +71,34 @@ class Api {
         throw error;
       }
     }
+  };
+
+  #needsAccessToken = (endpoint) => {
+    return !['login', 'signup', 'refresh'].includes(endpoint);
+  };
+
+  refreshAccessTokenIfNeeded = async () => {
+    if (accessToken) {
+      return;
+    }
+    if (!refreshPromise) {
+      refreshPromise = this.post('refresh', null)
+        .then((data) => {
+          accessToken = data.access_token;
+        })
+        .finally(() => {
+          refreshPromise = null;
+        });
+    }
+    return refreshPromise;
+  };
+
+  setAccessToken = (token) => {
+    accessToken = token;
+  };
+
+  clearAccessToken = () => {
+    accessToken = null;
   };
 
   get = async (endpoint) => {
