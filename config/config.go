@@ -1,13 +1,11 @@
 package config
 
 import (
-	"os"
 	"log"
-	"fmt"
+	"os"
 
 	"github.com/joho/godotenv"
 )
-
 
 type Config struct {
 	AppName string
@@ -15,11 +13,11 @@ type Config struct {
 	AppPort string
 
 	DBDriver string
-	DBName string
-	DBHost string
-	DBPort string
-	DBUser string
-	DBPass string
+	DBName   string
+	DBHost   string
+	DBPort   string
+	DBUser   string
+	DBPass   string
 
 	MailHost string
 	MailPort string
@@ -30,14 +28,13 @@ type Config struct {
 	BasicAuthPass string
 
 	JwtSecretKey string
-	LogLevel string
+	LogLevel     string
 }
 
 var cf Config
 
-
 func init() {
-	err := godotenv.Load(fmt.Sprintf("config/env/%s.env", os.Getenv("ENV")))
+	err := godotenv.Load("config/env/.env")
 
 	if err != nil {
 		log.Panic(err)
@@ -66,7 +63,6 @@ func init() {
 	cf.LogLevel = os.Getenv("LOG_LEVEL")
 }
 
-
-func GetConfig() *Config{
+func GetConfig() *Config {
 	return &cf
 }
