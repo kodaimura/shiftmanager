@@ -3,7 +3,7 @@ services:
     build:
       context: .
     ports:
-      - "3600:3600"
+      - "127.0.0.1:3600:3600"
     volumes:
       - .:/usr/src/app
     working_dir: /usr/src/app
