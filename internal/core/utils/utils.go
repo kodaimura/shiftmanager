@@ -2,17 +2,17 @@ package utils
 
 import (
 	"fmt"
-	"reflect"
 	"math/rand"
-	"time"
+	"reflect"
 	"strconv"
+	"strings"
+	"time"
 )
-
 
 func AtoiSlice(sl []string) ([]int, error) {
 	isl := make([]int, len(sl))
 	for i, v := range sl {
-		x , err := strconv.Atoi(v)
+		x, err := strconv.Atoi(v)
 		isl[i] = x
 		if err != nil {
 			return []int{}, err
@@ -21,6 +21,66 @@ func AtoiSlice(sl []string) ([]int, error) {
 	return isl, nil
 }
 
+func ParseDayCSV(value *string) ([]int, error) {
+	if value == nil {
+		return []int{}, nil
+	}
+
+	text := strings.TrimSpace(*value)
+	if text == "" {
+		return []int{}, nil
+	}
+
+	parts := strings.Split(text, ",")
+	days := make([]int, 0, len(parts))
+	seen := make(map[int]bool, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			return []int{}, fmt.Errorf("day must not be empty")
+		}
+
+		day, err := strconv.Atoi(part)
+		if err != nil {
+			return []int{}, fmt.Errorf("day must be a number: %s", part)
+		}
+		if day < 1 || day > 31 {
+			return []int{}, fmt.Errorf("day must be between 1 and 31: %d", day)
+		}
+		if seen[day] {
+			return []int{}, fmt.Errorf("day must not be duplicated: %d", day)
+		}
+
+		seen[day] = true
+		days = append(days, day)
+	}
+
+	return days, nil
+}
+
+func ValidateYearMonth(year, month int) error {
+	if year < 2000 || year > 2100 {
+		return fmt.Errorf("year must be between 2000 and 2100")
+	}
+	if month < 1 || month > 12 {
+		return fmt.Errorf("month must be between 1 and 12")
+	}
+	return nil
+}
+
+func ValidateDaysInMonth(year, month int, days []int) error {
+	if err := ValidateYearMonth(year, month); err != nil {
+		return err
+	}
+
+	lastDay := time.Date(year, time.Month(month)+1, 0, 0, 0, 0, 0, time.Local).Day()
+	for _, day := range days {
+		if day < 1 || day > lastDay {
+			return fmt.Errorf("day must be between 1 and %d: %d", lastDay, day)
+		}
+	}
+	return nil
+}
 
 func ItoaSlice(sl []int) []string {
 	asl := make([]string, len(sl))
@@ -29,8 +89,7 @@ func ItoaSlice(sl []int) []string {
 	}
 
 	return asl
-} 
-
+}
 
 func RandomString(length int, options ...string) string {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -47,7 +106,6 @@ func RandomString(length int, options ...string) string {
 	return string(b)
 }
 
-
 func GetFieldValue(obj interface{}, fieldName string) (interface{}, error) {
 	val := reflect.ValueOf(obj).Elem()
 	fieldVal := val.FieldByName(fieldName)
@@ -58,7 +116,6 @@ func GetFieldValue(obj interface{}, fieldName string) (interface{}, error) {
 
 	return fieldVal.Interface(), nil
 }
-
 
 func SetFieldValue(obj interface{}, fieldName string, newValue interface{}) error {
 	val := reflect.ValueOf(obj).Elem()
@@ -81,53 +138,51 @@ func SetFieldValue(obj interface{}, fieldName string, newValue interface{}) erro
 	return nil
 }
 
-
 func MapFields(dst, src interface{}) error {
-    srcVal := reflect.ValueOf(src)
-    dstVal := reflect.ValueOf(dst).Elem()
+	srcVal := reflect.ValueOf(src)
+	dstVal := reflect.ValueOf(dst).Elem()
 
-    if srcVal.Kind() == reflect.Slice || srcVal.Kind() == reflect.Array {
-        if dstVal.Kind() != reflect.Slice && dstVal.Kind() != reflect.Array {
-            return fmt.Errorf("dst must be a slice or array if src is a slice or array")
-        }
+	if srcVal.Kind() == reflect.Slice || srcVal.Kind() == reflect.Array {
+		if dstVal.Kind() != reflect.Slice && dstVal.Kind() != reflect.Array {
+			return fmt.Errorf("dst must be a slice or array if src is a slice or array")
+		}
 
-        newSlice := reflect.MakeSlice(dstVal.Type(), srcVal.Len(), srcVal.Len())
-        for i := 0; i < srcVal.Len(); i++ {
-            srcElem := srcVal.Index(i).Interface()
-            dstElem := reflect.New(newSlice.Index(i).Type()).Interface()
+		newSlice := reflect.MakeSlice(dstVal.Type(), srcVal.Len(), srcVal.Len())
+		for i := 0; i < srcVal.Len(); i++ {
+			srcElem := srcVal.Index(i).Interface()
+			dstElem := reflect.New(newSlice.Index(i).Type()).Interface()
 
-            if err := MapFields(dstElem, srcElem); err != nil {
-                return err
-            }
-            newSlice.Index(i).Set(reflect.ValueOf(dstElem).Elem())
-        }
+			if err := MapFields(dstElem, srcElem); err != nil {
+				return err
+			}
+			newSlice.Index(i).Set(reflect.ValueOf(dstElem).Elem())
+		}
 
-        dstVal.Set(newSlice)
-        return nil
-    }
+		dstVal.Set(newSlice)
+		return nil
+	}
 
-    if srcVal.Kind() != reflect.Struct || dstVal.Kind() != reflect.Struct {
-        return fmt.Errorf("src and dst must be structs or arrays/slices of structs")
-    }
+	if srcVal.Kind() != reflect.Struct || dstVal.Kind() != reflect.Struct {
+		return fmt.Errorf("src and dst must be structs or arrays/slices of structs")
+	}
 
-    for i := 0; i < srcVal.NumField(); i++ {
-        srcField := srcVal.Type().Field(i)
-        dstField := dstVal.FieldByName(srcField.Name)
+	for i := 0; i < srcVal.NumField(); i++ {
+		srcField := srcVal.Type().Field(i)
+		dstField := dstVal.FieldByName(srcField.Name)
 
-        if dstField.IsValid() && dstField.CanSet() && dstField.Type() == srcVal.Field(i).Type() {
-            dstField.Set(srcVal.Field(i))
-        }
-    }
+		if dstField.IsValid() && dstField.CanSet() && dstField.Type() == srcVal.Field(i).Type() {
+			dstField.Set(srcVal.Field(i))
+		}
+	}
 
-    return nil
+	return nil
 }
-
 
 func IsZero(value interface{}) bool {
 	if value == nil {
-        return true
-    }
-    v := reflect.ValueOf(value)
+		return true
+	}
+	v := reflect.ValueOf(value)
 	if v.Kind() == reflect.Ptr {
 		if v.IsNil() {
 			return true

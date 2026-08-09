@@ -86,7 +86,8 @@ const getShiftPreferred = async () => {
           if (!cell.classList.contains('highlight')) {
             cell.classList.add('highlight');
           }
-          cell.innerHTML += `${displayNameMap[accountId]}&nbsp;`;
+          cell.appendChild(document.createTextNode(displayNameMap[accountId] || ''));
+          cell.appendChild(document.createTextNode('\u00a0'));
         }
       };
     }

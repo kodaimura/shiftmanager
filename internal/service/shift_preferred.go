@@ -27,10 +27,14 @@ func NewShiftPreferredService() ShiftPreferredService {
 }
 
 func (srv *shiftPreferredService) GetOne(input dto.ShiftPreferredPK) (dto.ShiftPreferred, error) {
+	if err := utils.ValidateYearMonth(input.Year, input.Month); err != nil {
+		return dto.ShiftPreferred{}, err
+	}
+
 	shiftPreferred, err := srv.shiftPreferredRepository.GetOne(&model.ShiftPreferred{
 		AccountId: input.AccountId,
-		Year: input.Year,
-		Month: input.Month,
+		Year:      input.Year,
+		Month:     input.Month,
 	})
 
 	if err != nil {
@@ -48,10 +52,13 @@ func (srv *shiftPreferredService) GetOne(input dto.ShiftPreferredPK) (dto.ShiftP
 	return ret, nil
 }
 
-
 func (srv *shiftPreferredService) Get(input dto.GetShiftPreferred) ([]dto.ShiftPreferred, error) {
+	if err := utils.ValidateYearMonth(input.Year, input.Month); err != nil {
+		return []dto.ShiftPreferred{}, err
+	}
+
 	shiftPreferred, err := srv.shiftPreferredRepository.Get(&model.ShiftPreferred{
-		Year: input.Year,
+		Year:  input.Year,
 		Month: input.Month,
 	})
 
@@ -65,22 +72,32 @@ func (srv *shiftPreferredService) Get(input dto.GetShiftPreferred) ([]dto.ShiftP
 	return ret, nil
 }
 
-
 func (srv *shiftPreferredService) Save(input dto.SaveShiftPreferred) error {
-	shiftPreferred, err := srv.shiftPreferredRepository.GetOne(&model.ShiftPreferred{ 
-		AccountId: input.AccountId, 
-		Year: input.Year, 
-		Month: input.Month,
+	if err := utils.ValidateYearMonth(input.Year, input.Month); err != nil {
+		return err
+	}
+	days, err := utils.ParseDayCSV(input.Dates)
+	if err != nil {
+		return err
+	}
+	if err := utils.ValidateDaysInMonth(input.Year, input.Month, days); err != nil {
+		return err
+	}
+
+	shiftPreferred, err := srv.shiftPreferredRepository.GetOne(&model.ShiftPreferred{
+		AccountId: input.AccountId,
+		Year:      input.Year,
+		Month:     input.Month,
 	})
 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			shiftPreferred = model.ShiftPreferred{
 				AccountId: input.AccountId,
-				Year: input.Year,
-				Month: input.Month,
-				Dates: input.Dates,
-				Notes: input.Notes,
+				Year:      input.Year,
+				Month:     input.Month,
+				Dates:     input.Dates,
+				Notes:     input.Notes,
 			}
 			err = srv.shiftPreferredRepository.Insert(&shiftPreferred, nil)
 		} else {

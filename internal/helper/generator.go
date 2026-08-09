@@ -1,9 +1,9 @@
 package helper
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
-	"strings"
 	"time"
 
 	"shiftmanager/internal/core/utils"
@@ -12,20 +12,20 @@ import (
 )
 
 type ShiftGenerator struct {
-	year          int
-	month         int
-	holidays      []int
+	year            int
+	month           int
+	holidays        []int
 	dailyPreferreds *[31][]int
-	profileMap    map[int]model.AccountProfile
-	memberCount   int
+	profileMap      map[int]model.AccountProfile
+	memberCount     int
 }
 
 func NewShiftGenerator(year, month int, holidays []int) *ShiftGenerator {
 	return &ShiftGenerator{
-		year:   year,
-		month:  month,
-		holidays: holidays,
-		profileMap: make(map[int]model.AccountProfile),
+		year:        year,
+		month:       month,
+		holidays:    holidays,
+		profileMap:  make(map[int]model.AccountProfile),
 		memberCount: 0,
 	}
 }
@@ -38,6 +38,9 @@ func (gen *ShiftGenerator) InitRepositories() error {
 	}
 
 	for _, d := range gen.holidays {
+		if d < 1 || d > 31 {
+			return fmt.Errorf("invalid holiday: %d", d)
+		}
 		gen.dailyPreferreds[d-1] = []int{}
 	}
 
@@ -62,7 +65,13 @@ func (gen *ShiftGenerator) getDailyPreferreds() (*[31][]int, error) {
 
 	for _, p := range preferreds {
 		accountId := p.AccountId
-		dates, _ := utils.AtoiSlice(strings.Split(*p.Dates, ","))
+		dates, err := utils.ParseDayCSV(p.Dates)
+		if err != nil {
+			return &ret, err
+		}
+		if err := utils.ValidateDaysInMonth(gen.year, gen.month, dates); err != nil {
+			return &ret, err
+		}
 		for _, date := range dates {
 			ret[date-1] = append(ret[date-1], accountId)
 		}
@@ -158,15 +167,15 @@ func (gen *ShiftGenerator) evaluateUniformity(shift *[31][]int) int {
 	mean := total / float64(len(counts))
 	var varianceSum float64
 	for _, num := range counts {
-		varianceSum += math.Pow(float64(num) - mean, 2)
+		varianceSum += math.Pow(float64(num)-mean, 2)
 	}
 
 	variance := varianceSum / float64(len(counts))
 	stdDev := math.Sqrt(variance)
 	if stdDev == 0 {
-		return 100 - minmaxDiff * 2
+		return 100 - minmaxDiff*2
 	}
-	return int(math.Min((1 / stdDev) * 100, 100)) - minmaxDiff * 2
+	return int(math.Min((1/stdDev)*100, 100)) - minmaxDiff*2
 }
 
 func (gen *ShiftGenerator) evaluateRolePenalty(shift *[31][]int) int {

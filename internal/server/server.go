@@ -14,7 +14,10 @@ func Run() {
 
 func router() *gin.Engine {
 	r := gin.Default()
-	
+	if err := r.SetTrustedProxies(nil); err != nil {
+		panic(err)
+	}
+
 	//TEMPLATE
 	r.LoadHTMLGlob("web/template/*.html")
 

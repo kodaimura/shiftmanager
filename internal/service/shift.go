@@ -1,16 +1,15 @@
 package service
 
 import (
-	"fmt"
-	"strings"
 	"database/sql"
+	"fmt"
 
 	"shiftmanager/internal/core/logger"
 	"shiftmanager/internal/core/utils"
 	"shiftmanager/internal/dto"
+	"shiftmanager/internal/helper"
 	"shiftmanager/internal/model"
 	"shiftmanager/internal/repository"
-	"shiftmanager/internal/helper"
 )
 
 type ShiftService interface {
@@ -20,22 +19,26 @@ type ShiftService interface {
 }
 
 type shiftService struct {
-	shiftRepository repository.ShiftRepository
+	shiftRepository          repository.ShiftRepository
 	shiftPreferredRepository repository.ShiftPreferredRepository
 	accountProfileRepository repository.AccountProfileRepository
 }
 
 func NewShiftService() ShiftService {
 	return &shiftService{
-		shiftRepository: repository.NewShiftRepository(),
+		shiftRepository:          repository.NewShiftRepository(),
 		shiftPreferredRepository: repository.NewShiftPreferredRepository(),
 		accountProfileRepository: repository.NewAccountProfileRepository(),
 	}
 }
 
 func (srv *shiftService) GetOne(input dto.ShiftPK) (dto.Shift, error) {
+	if err := utils.ValidateYearMonth(input.Year, input.Month); err != nil {
+		return dto.Shift{}, err
+	}
+
 	shift, err := srv.shiftRepository.GetOne(&model.Shift{
-		Year: input.Year,
+		Year:  input.Year,
 		Month: input.Month,
 	})
 
@@ -54,20 +57,30 @@ func (srv *shiftService) GetOne(input dto.ShiftPK) (dto.Shift, error) {
 	return ret, nil
 }
 
-
 func (srv *shiftService) Save(input dto.SaveShift) error {
+	if err := utils.ValidateYearMonth(input.Year, input.Month); err != nil {
+		return err
+	}
+	holidays, err := utils.ParseDayCSV(input.StoreHoliday)
+	if err != nil {
+		return err
+	}
+	if err := utils.ValidateDaysInMonth(input.Year, input.Month, holidays); err != nil {
+		return err
+	}
+
 	shift, err := srv.shiftRepository.GetOne(&model.Shift{
-		Year: input.Year, 
+		Year:  input.Year,
 		Month: input.Month,
 	})
 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			shift = model.Shift{
-				Year: input.Year,
-				Month: input.Month,
+				Year:         input.Year,
+				Month:        input.Month,
 				StoreHoliday: input.StoreHoliday,
-				Data: input.Data,
+				Data:         input.Data,
 			}
 			err = srv.shiftRepository.Insert(&shift, nil)
 		} else {
@@ -88,18 +101,18 @@ func (srv *shiftService) Save(input dto.SaveShift) error {
 	return nil
 }
 
-
 func (srv *shiftService) Generate(input dto.GenerateShift) error {
-	err := srv.shiftRepository.Delete(&model.Shift{
-		Year: input.Year, 
-		Month: input.Month,
-	}, nil)
+	if err := utils.ValidateYearMonth(input.Year, input.Month); err != nil {
+		return err
+	}
+	holidays, err := utils.ParseDayCSV(input.StoreHoliday)
 	if err != nil {
-		logger.Error(err.Error())
+		return err
+	}
+	if err := utils.ValidateDaysInMonth(input.Year, input.Month, holidays); err != nil {
 		return err
 	}
 
-	holidays, _ := utils.AtoiSlice(strings.Split(*input.StoreHoliday, ","))
 	shiftGenerator := helper.NewShiftGenerator(input.Year, input.Month, holidays)
 	err = shiftGenerator.InitRepositories()
 	if err != nil {
@@ -112,11 +125,20 @@ func (srv *shiftService) Generate(input dto.GenerateShift) error {
 		return err
 	}
 
-	shift := model.Shift{
-		Year: input.Year,
+	err = srv.shiftRepository.Delete(&model.Shift{
+		Year:  input.Year,
 		Month: input.Month,
+	}, nil)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	shift := model.Shift{
+		Year:         input.Year,
+		Month:        input.Month,
 		StoreHoliday: input.StoreHoliday,
-		Data: &shiftCsv,
+		Data:         &shiftCsv,
 	}
 	if err = srv.shiftRepository.Insert(&shift, nil); err != nil {
 		logger.Error(err.Error())

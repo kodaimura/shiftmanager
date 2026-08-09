@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"shiftmanager/internal/core/utils"
-	"shiftmanager/internal/service"
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/request"
+	"shiftmanager/internal/service"
 )
 
 type ShiftController struct {
@@ -22,7 +22,7 @@ func NewShiftController() *ShiftController {
 // GET /shifts/:year/:month
 func (ctr *ShiftController) ShiftPage(c *gin.Context) {
 	c.HTML(200, "shift.html", gin.H{
-		"year": c.Param("year"),
+		"year":  c.Param("year"),
 		"month": c.Param("month"),
 	})
 }
@@ -30,9 +30,9 @@ func (ctr *ShiftController) ShiftPage(c *gin.Context) {
 // GET /api/shifts/:year/:month
 func (ctr *ShiftController) ApiGetOne(c *gin.Context) {
 	var params request.ShiftUri
-    if err := c.ShouldBindUri(&params); err != nil {
-        JsonError(c, 400, "不正なリクエストです。")
-        return
+	if err := c.ShouldBindUri(&params); err != nil {
+		JsonError(c, 400, "不正なリクエストです。")
+		return
 	}
 
 	var input dto.ShiftPK
@@ -50,9 +50,9 @@ func (ctr *ShiftController) ApiGetOne(c *gin.Context) {
 // POST /api/shifts/:year/:month
 func (ctr *ShiftController) ApiPost(c *gin.Context) {
 	var params request.ShiftUri
-    if err := c.ShouldBindUri(&params); err != nil {
-        JsonError(c, 400, "不正なリクエストです。")
-        return
+	if err := c.ShouldBindUri(&params); err != nil {
+		JsonError(c, 400, "不正なリクエストです。")
+		return
 	}
 
 	var req request.PostShift
@@ -64,6 +64,9 @@ func (ctr *ShiftController) ApiPost(c *gin.Context) {
 	var input dto.SaveShift
 	utils.MapFields(&input, params)
 	utils.MapFields(&input, req)
+	if !validateDayCSV(c, input.Year, input.Month, input.StoreHoliday) {
+		return
+	}
 
 	if err := ctr.shiftService.Save(input); err != nil {
 		JsonError(c, 500, "登録に失敗しました。")
@@ -75,9 +78,9 @@ func (ctr *ShiftController) ApiPost(c *gin.Context) {
 // POST /api/shifts/:year/:month/generate
 func (ctr *ShiftController) ApiGenerate(c *gin.Context) {
 	var params request.ShiftUri
-    if err := c.ShouldBindUri(&params); err != nil {
-        JsonError(c, 400, "不正なリクエストです。")
-        return
+	if err := c.ShouldBindUri(&params); err != nil {
+		JsonError(c, 400, "不正なリクエストです。")
+		return
 	}
 
 	var req request.PostShiftGenerate
@@ -89,6 +92,9 @@ func (ctr *ShiftController) ApiGenerate(c *gin.Context) {
 	var input dto.GenerateShift
 	utils.MapFields(&input, params)
 	utils.MapFields(&input, req)
+	if !validateDayCSV(c, input.Year, input.Month, input.StoreHoliday) {
+		return
+	}
 
 	if err := ctr.shiftService.Generate(input); err != nil {
 		JsonError(c, 500, "生成に失敗しました。")

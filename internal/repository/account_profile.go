@@ -7,7 +7,6 @@ import (
 	"shiftmanager/internal/model"
 )
 
-
 type AccountProfileRepository interface {
 	Get(ap *model.AccountProfile) ([]model.AccountProfile, error)
 	GetOne(ap *model.AccountProfile) (model.AccountProfile, error)
@@ -15,7 +14,6 @@ type AccountProfileRepository interface {
 	Update(ap *model.AccountProfile, tx *sql.Tx) error
 	Delete(ap *model.AccountProfile, tx *sql.Tx) error
 }
-
 
 type accountProfileRepository struct {
 	db *sql.DB
@@ -26,11 +24,10 @@ func NewAccountProfileRepository() AccountProfileRepository {
 	return &accountProfileRepository{db}
 }
 
-
 func (rep *accountProfileRepository) Get(ap *model.AccountProfile) ([]model.AccountProfile, error) {
 	where, binds := db.BuildWhereClause(ap)
-	query := 
-	`SELECT
+	query :=
+		`SELECT
 		account_id
 		,account_role
 		,display_name
@@ -38,11 +35,10 @@ func (rep *accountProfileRepository) Get(ap *model.AccountProfile) ([]model.Acco
 		,updated_at
 	 FROM account_profile ` + where
 	rows, err := rep.db.Query(query, binds...)
-	defer rows.Close()
-
 	if err != nil {
 		return []model.AccountProfile{}, err
 	}
+	defer rows.Close()
 
 	ret := []model.AccountProfile{}
 	for rows.Next() {
@@ -60,15 +56,18 @@ func (rep *accountProfileRepository) Get(ap *model.AccountProfile) ([]model.Acco
 		ret = append(ret, ap)
 	}
 
+	if err := rows.Err(); err != nil {
+		return []model.AccountProfile{}, err
+	}
+
 	return ret, nil
 }
-
 
 func (rep *accountProfileRepository) GetOne(ap *model.AccountProfile) (model.AccountProfile, error) {
 	var ret model.AccountProfile
 	where, binds := db.BuildWhereClause(ap)
-	query := 
-	`SELECT
+	query :=
+		`SELECT
 		account_id
 		,account_role
 		,display_name
@@ -87,10 +86,9 @@ func (rep *accountProfileRepository) GetOne(ap *model.AccountProfile) (model.Acc
 	return ret, err
 }
 
-
 func (rep *accountProfileRepository) Insert(ap *model.AccountProfile, tx *sql.Tx) error {
-	cmd := 
-	`INSERT INTO account_profile (
+	cmd :=
+		`INSERT INTO account_profile (
 		account_id
 		,account_role
 		,display_name
@@ -112,10 +110,9 @@ func (rep *accountProfileRepository) Insert(ap *model.AccountProfile, tx *sql.Tx
 	return err
 }
 
-
 func (rep *accountProfileRepository) Update(ap *model.AccountProfile, tx *sql.Tx) error {
-	cmd := 
-	`UPDATE account_profile
+	cmd :=
+		`UPDATE account_profile
 	 SET account_role = ?
 		,display_name = ?
 	 WHERE account_id = ?`
@@ -127,14 +124,13 @@ func (rep *accountProfileRepository) Update(ap *model.AccountProfile, tx *sql.Tx
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
 
 	return err
 }
-
 
 func (rep *accountProfileRepository) Delete(ap *model.AccountProfile, tx *sql.Tx) error {
 	where, binds := db.BuildWhereClause(ap)
@@ -142,10 +138,10 @@ func (rep *accountProfileRepository) Delete(ap *model.AccountProfile, tx *sql.Tx
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
 
 	return err
 }

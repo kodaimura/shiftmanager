@@ -87,30 +87,5 @@ func isAllowedOrigin(c *gin.Context, rawURL string) bool {
 		return false
 	}
 
-	return strings.EqualFold(parsed.Scheme, requestScheme(c)) &&
-		strings.EqualFold(parsed.Host, requestHost(c))
-}
-
-func requestScheme(c *gin.Context) string {
-	if proto := firstForwardedValue(c.Request.Header.Get("X-Forwarded-Proto")); proto != "" {
-		return proto
-	}
-	if c.Request.TLS != nil {
-		return "https"
-	}
-	return "http"
-}
-
-func requestHost(c *gin.Context) string {
-	if host := firstForwardedValue(c.Request.Header.Get("X-Forwarded-Host")); host != "" {
-		return host
-	}
-	return c.Request.Host
-}
-
-func firstForwardedValue(value string) string {
-	if value == "" {
-		return ""
-	}
-	return strings.TrimSpace(strings.Split(value, ",")[0])
+	return strings.EqualFold(parsed.Host, c.Request.Host)
 }

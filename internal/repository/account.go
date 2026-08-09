@@ -7,7 +7,6 @@ import (
 	"shiftmanager/internal/model"
 )
 
-
 type AccountRepository interface {
 	Get(a *model.Account) ([]model.Account, error)
 	GetOne(a *model.Account) (model.Account, error)
@@ -15,7 +14,6 @@ type AccountRepository interface {
 	Update(a *model.Account, tx *sql.Tx) error
 	Delete(a *model.Account, tx *sql.Tx) error
 }
-
 
 type accountRepository struct {
 	db *sql.DB
@@ -26,11 +24,10 @@ func NewAccountRepository() AccountRepository {
 	return &accountRepository{db}
 }
 
-
 func (rep *accountRepository) Get(a *model.Account) ([]model.Account, error) {
 	where, binds := db.BuildWhereClause(a)
-	query := 
-	`SELECT
+	query :=
+		`SELECT
 		account_id
 		,account_name
 		,account_password
@@ -38,11 +35,10 @@ func (rep *accountRepository) Get(a *model.Account) ([]model.Account, error) {
 		,updated_at
 	 FROM account ` + where
 	rows, err := rep.db.Query(query, binds...)
-	defer rows.Close()
-
 	if err != nil {
 		return []model.Account{}, err
 	}
+	defer rows.Close()
 
 	ret := []model.Account{}
 	for rows.Next() {
@@ -60,15 +56,18 @@ func (rep *accountRepository) Get(a *model.Account) ([]model.Account, error) {
 		ret = append(ret, a)
 	}
 
+	if err := rows.Err(); err != nil {
+		return []model.Account{}, err
+	}
+
 	return ret, nil
 }
-
 
 func (rep *accountRepository) GetOne(a *model.Account) (model.Account, error) {
 	var ret model.Account
 	where, binds := db.BuildWhereClause(a)
-	query := 
-	`SELECT
+	query :=
+		`SELECT
 		account_id
 		,account_name
 		,account_password
@@ -87,10 +86,9 @@ func (rep *accountRepository) GetOne(a *model.Account) (model.Account, error) {
 	return ret, err
 }
 
-
 func (rep *accountRepository) Insert(a *model.Account, tx *sql.Tx) (int, error) {
-	cmd := 
-	`INSERT INTO account (
+	cmd :=
+		`INSERT INTO account (
 		account_name
 		,account_password
 	 ) VALUES(?,?)
@@ -112,10 +110,9 @@ func (rep *accountRepository) Insert(a *model.Account, tx *sql.Tx) (int, error) 
 	return accountId, err
 }
 
-
 func (rep *accountRepository) Update(a *model.Account, tx *sql.Tx) error {
-	cmd := 
-	`UPDATE account
+	cmd :=
+		`UPDATE account
 	 SET account_name = ?
 		,account_password = ?
 	 WHERE account_id = ?`
@@ -127,14 +124,13 @@ func (rep *accountRepository) Update(a *model.Account, tx *sql.Tx) error {
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
 
 	return err
 }
-
 
 func (rep *accountRepository) Delete(a *model.Account, tx *sql.Tx) error {
 	where, binds := db.BuildWhereClause(a)
@@ -142,10 +138,10 @@ func (rep *accountRepository) Delete(a *model.Account, tx *sql.Tx) error {
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
 
 	return err
 }

@@ -7,7 +7,6 @@ import (
 	"shiftmanager/internal/model"
 )
 
-
 type ShiftRepository interface {
 	Get(s *model.Shift) ([]model.Shift, error)
 	GetOne(s *model.Shift) (model.Shift, error)
@@ -15,7 +14,6 @@ type ShiftRepository interface {
 	Update(s *model.Shift, tx *sql.Tx) error
 	Delete(s *model.Shift, tx *sql.Tx) error
 }
-
 
 type shiftRepository struct {
 	db *sql.DB
@@ -26,11 +24,10 @@ func NewShiftRepository() ShiftRepository {
 	return &shiftRepository{db}
 }
 
-
 func (rep *shiftRepository) Get(s *model.Shift) ([]model.Shift, error) {
 	where, binds := db.BuildWhereClause(s)
-	query := 
-	`SELECT
+	query :=
+		`SELECT
 		year
 		,month
 		,store_holiday
@@ -39,11 +36,10 @@ func (rep *shiftRepository) Get(s *model.Shift) ([]model.Shift, error) {
 		,updated_at
 	 FROM shift ` + where
 	rows, err := rep.db.Query(query, binds...)
-	defer rows.Close()
-
 	if err != nil {
 		return []model.Shift{}, err
 	}
+	defer rows.Close()
 
 	ret := []model.Shift{}
 	for rows.Next() {
@@ -62,15 +58,18 @@ func (rep *shiftRepository) Get(s *model.Shift) ([]model.Shift, error) {
 		ret = append(ret, s)
 	}
 
+	if err := rows.Err(); err != nil {
+		return []model.Shift{}, err
+	}
+
 	return ret, nil
 }
-
 
 func (rep *shiftRepository) GetOne(s *model.Shift) (model.Shift, error) {
 	var ret model.Shift
 	where, binds := db.BuildWhereClause(s)
-	query := 
-	`SELECT
+	query :=
+		`SELECT
 		year
 		,month
 		,store_holiday
@@ -91,10 +90,9 @@ func (rep *shiftRepository) GetOne(s *model.Shift) (model.Shift, error) {
 	return ret, err
 }
 
-
 func (rep *shiftRepository) Insert(s *model.Shift, tx *sql.Tx) error {
-	cmd := 
-	`INSERT INTO shift (
+	cmd :=
+		`INSERT INTO shift (
 		year
 		,month
 		,store_holiday
@@ -118,10 +116,9 @@ func (rep *shiftRepository) Insert(s *model.Shift, tx *sql.Tx) error {
 	return err
 }
 
-
 func (rep *shiftRepository) Update(s *model.Shift, tx *sql.Tx) error {
-	cmd := 
-	`UPDATE shift
+	cmd :=
+		`UPDATE shift
 	 SET year = ?
 		,month = ?
 		,store_holiday = ?
@@ -139,14 +136,13 @@ func (rep *shiftRepository) Update(s *model.Shift, tx *sql.Tx) error {
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
 
 	return err
 }
-
 
 func (rep *shiftRepository) Delete(s *model.Shift, tx *sql.Tx) error {
 	where, binds := db.BuildWhereClause(s)
@@ -154,10 +150,10 @@ func (rep *shiftRepository) Delete(s *model.Shift, tx *sql.Tx) error {
 
 	var err error
 	if tx != nil {
-        _, err = tx.Exec(cmd, binds...)
-    } else {
-        _, err = rep.db.Exec(cmd, binds...)
-    }
+		_, err = tx.Exec(cmd, binds...)
+	} else {
+		_, err = rep.db.Exec(cmd, binds...)
+	}
 
 	return err
 }

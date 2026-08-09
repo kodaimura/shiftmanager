@@ -5,9 +5,9 @@ import (
 
 	"shiftmanager/internal/core/jwt"
 	"shiftmanager/internal/core/utils"
-	"shiftmanager/internal/service"
 	"shiftmanager/internal/dto"
 	"shiftmanager/internal/request"
+	"shiftmanager/internal/service"
 )
 
 type ShiftPreferredController struct {
@@ -23,7 +23,7 @@ func NewShiftPreferredController() *ShiftPreferredController {
 // GET /shift_preferreds/me/:year/:month
 func (ctr *ShiftPreferredController) ShiftPreferredPage(c *gin.Context) {
 	c.HTML(200, "shift_preferred.html", gin.H{
-		"year": c.Param("year"),
+		"year":  c.Param("year"),
 		"month": c.Param("month"),
 	})
 }
@@ -33,9 +33,9 @@ func (ctr *ShiftPreferredController) ApiGetOne(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
 	var params request.ShiftPreferredUri
-    if err := c.ShouldBindUri(&params); err != nil {
-        JsonError(c, 400, "不正なリクエストです。")
-        return
+	if err := c.ShouldBindUri(&params); err != nil {
+		JsonError(c, 400, "不正なリクエストです。")
+		return
 	}
 
 	var input dto.ShiftPreferredPK
@@ -56,9 +56,9 @@ func (ctr *ShiftPreferredController) ApiPost(c *gin.Context) {
 	pl := jwt.GetPayload(c)
 
 	var params request.ShiftPreferredUri
-    if err := c.ShouldBindUri(&params); err != nil {
-        JsonError(c, 400, "不正なリクエストです。")
-        return
+	if err := c.ShouldBindUri(&params); err != nil {
+		JsonError(c, 400, "不正なリクエストです。")
+		return
 	}
 
 	var req request.PostShiftPreferred
@@ -71,6 +71,9 @@ func (ctr *ShiftPreferredController) ApiPost(c *gin.Context) {
 	utils.MapFields(&input, params)
 	utils.MapFields(&input, req)
 	input.AccountId = pl.AccountId
+	if !validateDayCSV(c, input.Year, input.Month, input.Dates) {
+		return
+	}
 
 	if err := ctr.shiftPreferredService.Save(input); err != nil {
 		JsonError(c, 500, "登録に失敗しました。")
@@ -79,13 +82,12 @@ func (ctr *ShiftPreferredController) ApiPost(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
-
 // GET /api/shift_preferreds?year=:year&month=:month
 func (ctr *ShiftPreferredController) ApiGet(c *gin.Context) {
 	var params request.ShiftPreferredQuery
-    if err := c.ShouldBindQuery(&params); err != nil {
-        JsonError(c, 400, "不正なリクエストです。")
-        return
+	if err := c.ShouldBindQuery(&params); err != nil {
+		JsonError(c, 400, "不正なリクエストです。")
+		return
 	}
 
 	var input dto.GetShiftPreferred
